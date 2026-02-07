@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BASEBALL | Dashboard</title>
 
-  <!-- すでにある font.css を使う -->
   <link rel="stylesheet" href="font.css" />
-  <!-- 画面デザイン用 -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body data-page="dashboard">
   <div class="app">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar__top">
         <button class="icon-btn" aria-label="メニュー">
@@ -21,74 +18,20 @@
             <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
-
         <div class="brand">
           <span class="brand__dot" aria-hidden="true"></span>
           <span class="brand__name">BASEBALL</span>
         </div>
       </div>
 
+      <!-- ★リンク付きナビ（ここ重要） -->
       <nav class="nav">
-        <a class="nav__item is-active" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" fill="currentColor"/>
-            </svg>
-          </span>
-          <span class="nav__label">ダッシュボード</span>
-        </a>
-
-        <a class="nav__item" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M7 2v2M17 2v2M4 7h16M6 5h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="nav__label">予定表</span>
-        </a>
-
-        <a class="nav__item" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M7 6h14M7 12h14M7 18h14M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="nav__label">練習メニュー</span>
-        </a>
-
-        <a class="nav__item" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="2"/>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="nav__label">部員管理</span>
-        </a>
-
-        <a class="nav__item" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 19V5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 17V9M12 17V7M16 17v-5M20 17V11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="nav__label">個人成績</span>
-        </a>
-
-        <a class="nav__item" href="#">
-          <span class="nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M12 9v4M12 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="nav__label">欠席連絡</span>
-        </a>
+        <a class="nav__item" data-nav="dashboard" href="index.html"><span class="nav__label">ダッシュボード</span></a>
+        <a class="nav__item" data-nav="schedules" href="schedules.html"><span class="nav__label">予定表</span></a>
+        <a class="nav__item" data-nav="menus" href="menus.html"><span class="nav__label">練習メニュー</span></a>
+        <a class="nav__item" data-nav="members" href="members.html"><span class="nav__label">部員管理</span></a>
+        <a class="nav__item" data-nav="records" href="records.html"><span class="nav__label">個人成績</span></a>
+        <a class="nav__item" data-nav="absences" href="absences.html"><span class="nav__label">欠席連絡</span></a>
       </nav>
 
       <div class="sidebar__bottom">
@@ -102,7 +45,6 @@
       </div>
     </aside>
 
-    <!-- Main -->
     <main class="main">
       <header class="page-head">
         <div class="page-head__title">
@@ -116,37 +58,17 @@
 
       <section class="cards">
         <article class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="card__value">0</div>
+          <div class="card__value" id="stat-members">0</div>
           <div class="card__label">部員数</div>
         </article>
 
         <article class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M7 2v2M17 2v2M4 7h16M6 5h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="card__value">0</div>
+          <div class="card__value" id="stat-week">0</div>
           <div class="card__label">今週の予定</div>
         </article>
 
         <article class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M14 2v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 13h8M8 17h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="card__value">0</div>
+          <div class="card__value" id="stat-menus">0</div>
           <div class="card__label">練習メニュー</div>
         </article>
       </section>
@@ -156,19 +78,17 @@
           <span class="section-dot" aria-hidden="true"></span>
           <h2>今週の予定</h2>
         </div>
-
         <div class="section__rule"></div>
 
-        <div class="empty-box">
+        <!-- ★ここにJSで予定が描画されます -->
+        <div class="empty-box" id="week-box">
           <p>今週の予定はありません</p>
         </div>
       </section>
-
-      <button class="made-with" type="button" aria-label="Made with Manus（飾りボタン）">
-        <span class="made-with__icon" aria-hidden="true">✦</span>
-        <span>Made with Manus</span>
-      </button>
     </main>
   </div>
+
+  <!-- ★これが無いと「機能」が動きません -->
+  <script src="app.js"></script>
 </body>
 </html>
