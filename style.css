@@ -473,3 +473,83 @@ dialog{
 
 /* 下の一覧の雰囲気を近づける */
 .section__rule{ margin-top: 12px; }
+
+/* ===== Calendar (schedules) FIX ===== */
+.cal-head{
+  margin-top: 18px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cal-title{
+  font-weight: 900;
+  font-size: 22px;
+}
+.cal-nav{
+  width: 42px;
+  height: 42px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 24px;
+  cursor: pointer;
+}
+.cal-nav:hover{ background:#fafafa; }
+
+.cal-dow{
+  margin-top: 14px;
+  display:grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  border: 1px solid #e6e6e6;
+  border-bottom: none;
+  background:#fff;
+}
+.cal-dow > div{
+  padding: 10px 12px;
+  font-weight: 900;
+  font-size: 13px;
+  border-right: 1px solid #efefef;
+}
+.cal-dow > div:last-child{ border-right:none; }
+.cal-dow .sun{ color:#d40924; }
+
+.cal-grid{
+  display:grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  border: 1px solid #e6e6e6;
+  background:#fff;
+}
+
+.cal-cell{
+  min-height: 92px;
+  border-right: 1px solid #efefef;
+  border-top: 1px solid #efefef;
+  padding: 10px 12px;
+  text-align: left;
+  background:#fff;
+  cursor: pointer;
+}
+.cal-cell:nth-child(7n){ border-right:none; }
+.cal-cell:hover{ background:#fafafa; }
+
+.cal-cell.is-out{ background:#fbfbfb; color:#b6b6b6; }
+.cal-cell.is-today{ outline: 2px solid #111; outline-offset: -2px; }
+.cal-cell.is-selected{ outline: 2px solid #d40924; outline-offset: -2px; }
+
+.cal-day{ font-weight: 900; }
+.cal-day.sun{ color:#d40924; }
+
+.cal-dots{
+  margin-top: 8px;
+  display:flex;
+  gap: 6px;
+  align-items:center;
+}
+.dot{
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background:#d40924;
+  display:inline-block;
+}
+.more{ font-size: 12px; font-weight: 900; color:#6f6f6f; }
