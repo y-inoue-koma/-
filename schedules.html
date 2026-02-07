@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="font.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body data-page="schedules">
   <div class="app">
-    <!-- Sidebar（index.htmlと同じ） -->
     <aside class="sidebar">
       <div class="sidebar__top">
         <button class="icon-btn" aria-label="メニュー">
@@ -24,43 +24,105 @@
       </div>
 
       <nav class="nav">
-        <a class="nav__item" data-nav="dashboard" href="index.html"><span class="nav__label">ダッシュボード</span></a>
-        <a class="nav__item" data-nav="schedules" href="schedules.html"><span class="nav__label">予定表</span></a>
-        <a class="nav__item" data-nav="menus" href="menus.html"><span class="nav__label">練習メニュー</span></a>
-        <a class="nav__item" data-nav="members" href="members.html"><span class="nav__label">部員管理</span></a>
-        <a class="nav__item" data-nav="records" href="records.html"><span class="nav__label">個人成績</span></a>
-        <a class="nav__item" data-nav="absences" href="absences.html"><span class="nav__label">欠席連絡</span></a>
+        <a class="nav__item" data-nav="dashboard" href="/-/index.html"><span class="nav__label">ダッシュボード</span></a>
+        <a class="nav__item" data-nav="schedules" href="/-/schedules.html"><span class="nav__label">予定表</span></a>
+        <a class="nav__item" data-nav="menus" href="/-/menus.html"><span class="nav__label">練習メニュー</span></a>
+        <a class="nav__item" data-nav="members" href="/-/members.html"><span class="nav__label">部員管理</span></a>
+        <a class="nav__item" data-nav="records" href="/-/records.html"><span class="nav__label">個人成績</span></a>
+        <a class="nav__item" data-nav="absences" href="/-/absences.html"><span class="nav__label">欠席連絡</span></a>
       </nav>
+
+      <!-- 左下：ログインUI -->
+      <div class="sidebar__bottom">
+        <div class="user">
+          <div class="user__avatar">裕</div>
+          <div class="user__meta">
+            <div class="user__name" id="auth-name">未ログイン</div>
+            <div class="user__role" id="auth-email"></div>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn--primary" id="btn-login" type="button">ログイン</button>
+              <button class="btn" id="btn-logout" type="button">ログアウト</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ログインDialog -->
+      <dialog id="dlg-login">
+        <div class="dialog__head">
+          <div class="dialog__title">ログイン</div>
+          <button class="btn btn--ghost" data-close-dialog="dlg-login" type="button">閉じる</button>
+        </div>
+        <form id="form-login">
+          <div class="dialog__body">
+            <div class="field">
+              <label>メールアドレス</label>
+              <input id="loginEmail" type="email" required placeholder="例：xxx@gmail.com" />
+            </div>
+            <div class="field">
+              <label>表示名（任意）</label>
+              <input id="loginName" placeholder="例：裕貴 井上" />
+            </div>
+            <div class="muted" style="margin-top:10px">
+              ※GitHub Pages版は簡易ログインです（完全なアクセス制限ではありません）。
+            </div>
+          </div>
+          <div class="dialog__foot">
+            <button class="btn btn--primary" type="submit">ログイン</button>
+          </div>
+        </form>
+      </dialog>
     </aside>
 
     <main class="main">
       <header class="page-head">
         <div class="page-head__title">
           <span class="title-dot" aria-hidden="true"></span>
-          <h1>予定表</h1>
+          <h1>SCHEDULE</h1>
         </div>
-        <p class="page-head__sub">予定を追加・削除できます（ブラウザに保存）</p>
+        <p class="page-head__sub">予定表・カレンダー</p>
       </header>
 
       <div class="divider"></div>
 
-      <div class="toolbar">
-        <div class="toolbar__left">
-          <div class="muted">件数: <span id="schedule-count">0</span></div>
-        </div>
-        <div class="toolbar__right">
-          <button class="btn btn--primary" data-open-dialog="dlg-schedule">＋ 予定を追加</button>
-        </div>
+      <!-- カレンダーヘッダー -->
+      <div class="cal-head">
+        <button class="cal-nav" id="cal-prev" type="button" aria-label="前の月">‹</button>
+        <div class="cal-title" id="cal-title">2026年2月</div>
+        <button class="cal-nav" id="cal-next" type="button" aria-label="次の月">›</button>
       </div>
 
+      <!-- 曜日 -->
+      <div class="cal-dow">
+        <div class="sun">日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+      </div>
+
+      <!-- カレンダー本体 -->
+      <div class="cal-grid" id="cal-grid"></div>
+
+      <!-- 選択日の予定一覧 -->
       <section class="section">
-        <div style="margin-top:14px" id="schedules-list"></div>
+        <div class="section__head" style="margin-top:18px">
+          <span class="section-dot" aria-hidden="true"></span>
+          <h2 id="day-title">2026年2月1日(日)</h2>
+        </div>
+        <div class="section__rule"></div>
+
+        <div class="toolbar" style="margin-top:12px">
+          <div class="toolbar__left muted">この日の予定</div>
+          <div class="toolbar__right">
+            <button class="btn btn--primary" id="btn-open-schedule" type="button">＋ 予定を追加</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" id="day-list"></div>
       </section>
 
+      <!-- 追加/編集 dialog -->
       <dialog id="dlg-schedule">
         <div class="dialog__head">
-          <div class="dialog__title">予定を追加</div>
-          <button class="btn btn--ghost" data-close-dialog="dlg-schedule">閉じる</button>
+          <div class="dialog__title" id="dlg-schedule-title">予定を追加</div>
+          <button class="btn btn--ghost" data-close-dialog="dlg-schedule" type="button">閉じる</button>
         </div>
         <form id="form-schedule">
           <div class="dialog__body">
@@ -94,11 +156,10 @@
             </div>
           </div>
           <div class="dialog__foot">
-            <button class="btn btn--primary" type="submit">保存</button>
+            <button class="btn btn--primary" id="btn-schedule-save" type="submit">保存</button>
           </div>
         </form>
       </dialog>
-
     </main>
   </div>
 
