@@ -535,14 +535,75 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   if (page === "dashboard") renderDashboard();
   if (page === "members") renderMembers();
-  if (page === "schedules") renderSchedules();
+if (page === "schedules") {
+  // （ログインを使ってるならここで必須化）
+  // if (!requireLogin()) return;
+
+  // 初期：当月 & 今日を選択
+  const now = new Date();
+  calCurrent = new Date(now.getFullYear(), now.getMonth(), 1);
+  calSelectedYMD = todayYMD();
+
+  // 月移動
+  $("#cal-prev")?.addEventListener("click", ()=>{
+    calCurrent = new Date(calCurrent.getFullYear(), calCurrent.getMonth()-1, 1);
+    setMonthTitle();
+    renderCalendar();
+  });
+  $("#cal-next")?.addEventListener("click", ()=>{
+    calCurrent = new Date(calCurrent.getFullYear(), calCurrent.getMonth()+1, 1);
+    setMonthTitle();
+    renderCalendar();
+  });
+
+  // 追加ボタン：選択日をデフォルトに
+  $("#btn-open-schedule")?.addEventListener("click", ()=>{
+    editingScheduleId = null;
+    $("#dlg-schedule-title").textContent = "予定を追加";
+    $("#btn-schedule-save").textContent = "保存";
+
+    $("#schDate").value = calSelectedYMD || todayYMD();
+    $("#schType").value = "practice";
+    $("#schTitle").value = "";
+    $("#schStart").value = "";
+    $("#schEnd").value = "";
+    $("#schNote").value = "";
+
+    openDialog("dlg-schedule");
+  });
+
+  setMonthTitle();
+  renderCalendar();
+  renderSelectedDay();
+}
+
   if (page === "menus") renderMenus();
   if (page === "records") renderRecords();
   if (page === "absences") renderAbsences();
 
   // Bind forms if present
   $("#form-member")?.addEventListener("submit", submitMemberForm);
-  $("#form-schedule")?.addEventListener("submit", submitScheduleForm);
+  $("#form-schedule")?.addEventListener("submit", (e)=>{
+  submitScheduleForm(e); // 既存の保存処理を使う
+
+  // schedulesページのときだけ、カレンダー再描画
+  if (document.body.getAttribute("data-page") === "schedules") {
+    // 保存した日付へ選択を合わせる
+    const savedDate = $("#schDate")?.value;
+    if (savedDate) calSelectedYMD = savedDate;
+
+    // 表示月も合わせる
+    if (calSelectedYMD) {
+      const dd = dateFromYMD(calSelectedYMD);
+      calCurrent = new Date(dd.getFullYear(), dd.getMonth(), 1);
+    }
+
+    setMonthTitle();
+    renderCalendar();
+    renderSelectedDay();
+  }
+});
+
   $("#form-menu")?.addEventListener("submit", submitMenuForm);
   $("#form-record")?.addEventListener("submit", submitRecordForm);
   $("#form-absence")?.addEventListener("submit", submitAbsenceForm);
@@ -557,3 +618,167 @@ document.addEventListener("DOMContentLoaded", ()=>{
     });
   });
 });
+
+/* ===== Calendar UI for schedules ===== */
+let calCurrent = null;     // Date (first day of current month)
+let calSelectedYMD = null; // "YYYY-MM-DD"
+
+function ymdFromDate(d){
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+function dateFromYMD(ymd){
+  return new Date(ymd + "T00:00:00");
+}
+function jpDayName(d){
+  return ["日","月","火","水","木","金","土"][d.getDay()];
+}
+function setMonthTitle(){
+  const el = document.getElementById("cal-title");
+  if (!el || !calCurrent) return;
+  el.textContent = `${calCurrent.getFullYear()}年${calCurrent.getMonth()+1}月`;
+}
+
+function schedulesByDateMap(){
+  const schedules = load(STORAGE_KEYS.schedules, []);
+  const map = new Map();
+  for (const s of schedules){
+    if (!map.has(s.date)) map.set(s.date, []);
+    map.get(s.date).push(s);
+  }
+  // sort per day
+  for (const [k, arr] of map){
+    arr.sort((a,b)=> (a.startTime||"").localeCompare(b.startTime||""));
+  }
+  return map;
+}
+
+function renderCalendar(){
+  const grid = document.getElementById("cal-grid");
+  if (!grid || !calCurrent) return;
+
+  const map = schedulesByDateMap();
+
+  const first = new Date(calCurrent.getFullYear(), calCurrent.getMonth(), 1);
+  const last  = new Date(calCurrent.getFullYear(), calCurrent.getMonth()+1, 0);
+
+  // start from Sunday of the week containing the 1st
+  const start = new Date(first);
+  start.setDate(first.getDate() - first.getDay()); // Sun start
+  // end at Saturday of the week containing the last day
+  const end = new Date(last);
+  end.setDate(last.getDate() + (6 - last.getDay()));
+
+  const today = todayYMD();
+  const cells = [];
+  const curMonth = calCurrent.getMonth();
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+    const ymd = ymdFromDate(d);
+    const inMonth = d.getMonth() === curMonth;
+    const isToday = ymd === today;
+    const isSel = ymd === calSelectedYMD;
+
+    const items = map.get(ymd) || [];
+    const dotCount = Math.min(items.length, 3);
+
+    cells.push(`
+      <button class="cal-cell ${inMonth ? "" : "is-out"} ${isToday ? "is-today" : ""} ${isSel ? "is-selected" : ""}"
+              type="button" data-ymd="${ymd}">
+        <div class="cal-day ${d.getDay()===0 ? "sun" : ""}">${d.getDate()}</div>
+        <div class="cal-dots">
+          ${Array.from({length: dotCount}).map(()=>`<span class="dot"></span>`).join("")}
+          ${items.length > 3 ? `<span class="more">+${items.length-3}</span>` : ""}
+        </div>
+      </button>
+    `);
+  }
+
+  grid.innerHTML = cells.join("");
+
+  // bind click
+  $all(".cal-cell", grid).forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      calSelectedYMD = btn.getAttribute("data-ymd");
+      renderCalendar();
+      renderSelectedDay();
+    });
+  });
+}
+
+function renderSelectedDay(){
+  const title = document.getElementById("day-title");
+  const list = document.getElementById("day-list");
+  if (!title || !list || !calSelectedYMD) return;
+
+  const d = dateFromYMD(calSelectedYMD);
+  title.textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${jpDayName(d)})`;
+
+  const schedules = load(STORAGE_KEYS.schedules, []).filter(s=>s.date===calSelectedYMD)
+    .sort((a,b)=> (a.startTime||"").localeCompare(b.startTime||""));
+
+  if (schedules.length === 0){
+    list.innerHTML = `<div class="empty-box"><p>この日の予定はありません</p></div>`;
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="list">
+      ${schedules.map(it=>`
+        <div class="list__row ${calSelectedYMD===todayYMD() ? "is-today" : ""}">
+          <div class="list__left">
+            <div class="badge">${typeLabel(it.type)}</div>
+            <div>
+              <div class="list__title">${escapeHtml(it.title)}</div>
+              <div class="list__sub">
+                ${escapeHtml(it.startTime||"")}${it.endTime ? " - "+escapeHtml(it.endTime) : ""}
+              </div>
+              ${it.note ? `<div class="list__note">${escapeHtml(it.note)}</div>` : ""}
+            </div>
+          </div>
+          <div class="list__right">
+            <button class="btn" data-edit-schedule="${it.id}">編集</button>
+            <button class="btn btn--ghost" data-del-schedule="${it.id}">削除</button>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  // reuse handlers（既存の編集/削除の関数がある前提で同様に実装）
+  const allSchedules = load(STORAGE_KEYS.schedules, []);
+
+  $all("[data-del-schedule]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-del-schedule");
+      if (!confirm("この予定を削除しますか？")) return;
+      save(STORAGE_KEYS.schedules, allSchedules.filter(s=>s.id!==id));
+      renderCalendar();
+      renderSelectedDay();
+    });
+  });
+
+  $all("[data-edit-schedule]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-edit-schedule");
+      const it = allSchedules.find(s=>s.id===id);
+      if (!it) return;
+
+      // 既存の編集UIに合わせてフォームへ反映
+      window.editingScheduleId = id; // 既存変数があれば上書きされてもOK
+      document.getElementById("dlg-schedule-title").textContent = "予定を編集";
+      document.getElementById("btn-schedule-save").textContent = "更新";
+
+      document.getElementById("schDate").value = it.date || "";
+      document.getElementById("schType").value = it.type || "practice";
+      document.getElementById("schTitle").value = it.title || "";
+      document.getElementById("schStart").value = it.startTime || "";
+      document.getElementById("schEnd").value = it.endTime || "";
+      document.getElementById("schNote").value = it.note || "";
+
+      openDialog("dlg-schedule");
+    });
+  });
+}
