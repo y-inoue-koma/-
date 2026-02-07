@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>予定表</title>
+  <link rel="stylesheet" href="font.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="schedules">
+  <div class="app">
+    <!-- Sidebar（index.htmlと同じ） -->
+    <aside class="sidebar">
+      <div class="sidebar__top">
+        <button class="icon-btn" aria-label="メニュー">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="brand">
+          <span class="brand__dot" aria-hidden="true"></span>
+          <span class="brand__name">BASEBALL</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav__item" data-nav="dashboard" href="index.html"><span class="nav__label">ダッシュボード</span></a>
+        <a class="nav__item" data-nav="schedules" href="schedules.html"><span class="nav__label">予定表</span></a>
+        <a class="nav__item" data-nav="menus" href="menus.html"><span class="nav__label">練習メニュー</span></a>
+        <a class="nav__item" data-nav="members" href="members.html"><span class="nav__label">部員管理</span></a>
+        <a class="nav__item" data-nav="records" href="records.html"><span class="nav__label">個人成績</span></a>
+        <a class="nav__item" data-nav="absences" href="absences.html"><span class="nav__label">欠席連絡</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="page-head">
+        <div class="page-head__title">
+          <span class="title-dot" aria-hidden="true"></span>
+          <h1>予定表</h1>
+        </div>
+        <p class="page-head__sub">予定を追加・削除できます（ブラウザに保存）</p>
+      </header>
+
+      <div class="divider"></div>
+
+      <div class="toolbar">
+        <div class="toolbar__left">
+          <div class="muted">件数: <span id="schedule-count">0</span></div>
+        </div>
+        <div class="toolbar__right">
+          <button class="btn btn--primary" data-open-dialog="dlg-schedule">＋ 予定を追加</button>
+        </div>
+      </div>
+
+      <section class="section">
+        <div style="margin-top:14px" id="schedules-list"></div>
+      </section>
+
+      <dialog id="dlg-schedule">
+        <div class="dialog__head">
+          <div class="dialog__title">予定を追加</div>
+          <button class="btn btn--ghost" data-close-dialog="dlg-schedule">閉じる</button>
+        </div>
+        <form id="form-schedule">
+          <div class="dialog__body">
+            <div class="field">
+              <label>日付 *</label>
+              <input id="schDate" type="date" required />
+            </div>
+            <div class="field">
+              <label>種類</label>
+              <select id="schType">
+                <option value="practice">練習</option>
+                <option value="game">試合</option>
+                <option value="meeting">ミーティング</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>タイトル *</label>
+              <input id="schTitle" placeholder="例：練習（守備）" required />
+            </div>
+            <div class="field">
+              <label>時間</label>
+              <div style="display:flex; gap:10px">
+                <input id="schStart" type="time" />
+                <input id="schEnd" type="time" />
+              </div>
+            </div>
+            <div class="field">
+              <label>メモ</label>
+              <textarea id="schNote" placeholder="集合場所、持ち物など"></textarea>
+            </div>
+          </div>
+          <div class="dialog__foot">
+            <button class="btn btn--primary" type="submit">保存</button>
+          </div>
+        </form>
+      </dialog>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
