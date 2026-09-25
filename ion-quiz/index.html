@@ -160,6 +160,12 @@ table.grid{border-collapse:collapse;min-width:980px;width:100%;font-size:13px}
 .status a{color:var(--accent);font-weight:700}
 .note{font-size:13px;color:var(--muted)}
 
+.img-out{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:grid;gap:12px}
+.img-out-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.img-out-head p{margin:0}
+.img-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.img-list figure{margin:0;display:grid;gap:4px;font-size:12px;color:var(--muted);text-align:center}
+.img-list img{width:100%;height:auto;border:1px solid var(--line);-webkit-touch-callout:default}
 .pages{margin-top:18px;display:grid;gap:16px;justify-items:center}
 .page-slot{overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.2);border-radius:2px;background:#fff}
 #measure{position:absolute;left:-12000px;top:0;pointer-events:none}
@@ -331,10 +337,15 @@ table.grid{border-collapse:collapse;min-width:980px;width:100%;font-size:13px}
         </div>
         <div class="actions">
           <button class="btn" id="pdf-test">PDFをダウンロード</button>
+          <button class="btn" id="img-test" hidden>画像にして保存</button>
           <button class="btn ghost" id="print-test" hidden>印刷する</button>
           <button class="btn ghost" id="make-test">問題を入れかえる</button>
         </div>
         <p class="status" id="t-status" aria-live="polite"></p>
+      </div>
+      <div class="img-out" id="img-out" hidden>
+        <div class="img-out-head"><p><b>画像を長押しして「"写真"に追加」</b>を選ぶと保存できます。写真アプリから印刷やAirDropもできます。</p><button class="btn ghost small" id="img-close">閉じる</button></div>
+        <div class="img-list" id="img-list"></div>
       </div>
     </div>
     <div class="pages" id="pages"></div>
@@ -731,6 +742,7 @@ function buildPages(ans){
 }
 var PAGE_W=210*96/25.4,PAGE_H=297*96/25.4;
 function layoutTest(){
+  $("img-out").hidden=true;$("img-list").innerHTML="";
   var mode=radio("tout");var out=[];
   if(mode!=="a")out=out.concat(buildPages(false));
   if(mode!=="q")out=out.concat(buildPages(true));
@@ -763,7 +775,10 @@ var dlPromise=(function(){
   try{if(window.claude&&typeof window.claude.use==="function")return window.claude.use("downloads").catch(function(){return null;});}catch(e){}
   return Promise.resolve(null);
 })();
-if(!topLevel){$("pdf-test").hidden=true;dlPromise.then(function(dl){$("pdf-test").hidden=!dl;});}
+if(!topLevel){
+  $("pdf-test").hidden=true;$("img-test").hidden=false;
+  dlPromise.then(function(dl){$("pdf-test").hidden=!dl;$("img-test").hidden=!!dl;});
+}
 
 var libsPromise=null;
 function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=function(){rej(new Error("load "+src));};document.head.appendChild(s);});}
@@ -776,23 +791,41 @@ function loadLibs(){
   }
   return libsPromise;
 }
-async function makePdf(){
+// 表示中の各ページを画像（JPEG）にする
+async function renderPageImages(label){
   await loadLibs();
   if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
-  var pages=$("pages").querySelectorAll(".page");var host=measureHost();
+  var pages=$("pages").querySelectorAll(".page");var host=measureHost();var out=[];
   try{
     for(var i=0;i<pages.length;i++){
-      setStatus("PDFを作成中… "+(i+1)+" / "+pages.length+" ページ");
+      setStatus(label+"を作成中… "+(i+1)+" / "+pages.length+" ページ");
       var clone=pages[i].cloneNode(true);clone.style.transform="";
       host.innerHTML="";host.appendChild(clone);
       var canvas=await window.html2canvas(clone,{scale:2,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0});
-      if(i>0)pdf.addPage();
-      pdf.addImage(canvas.toDataURL("image/jpeg",0.9),"JPEG",0,0,210,297);
+      out.push({src:canvas.toDataURL("image/jpeg",0.9),foot:pages[i].querySelector(".pg-foot").textContent});
     }
   }finally{host.innerHTML="";}
+  return out;
+}
+async function makePdf(){
+  var imgs=await renderPageImages("PDF");
+  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
+  imgs.forEach(function(im,i){if(i>0)pdf.addPage();pdf.addImage(im.src,"JPEG",0,0,210,297);});
   return pdf.output("blob");
 }
+// ファイル保存が使えない表示（claude.ai にログインしていない人など）では、画像にして長押しで保存してもらう
+$("img-test").addEventListener("click",async function(){
+  var btn=this;btn.disabled=true;
+  try{
+    var imgs=await renderPageImages("画像");
+    $("img-list").innerHTML=imgs.map(function(im){return '<figure><img src="'+im.src+'" alt="'+esc(im.foot)+'ページ"><figcaption>'+esc(im.foot)+"</figcaption></figure>";}).join("");
+    $("img-out").hidden=false;setStatus("");
+    $("img-out").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){
+    setStatus("画像を作れませんでした。インターネットにつながっているか確かめて、もう一度押してください。",true);
+  }finally{btn.disabled=false;}
+});
+$("img-close").addEventListener("click",function(){$("img-out").hidden=true;$("img-list").innerHTML="";});
 function pdfName(){
   var d=new Date();var ymd=d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);
   var mode=radio("tout");
