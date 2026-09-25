@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>イオンと化合物ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --sunk:#E8ECF3; --ink:#172033; --muted:#5A6378; --line:#D5DBE6;
+  --accent:#2F3E9E; --accent-ink:#FFFFFF; --accent-soft:#E3E7FA;
+  --cat:#C9481F; --cat-soft:#FBE8E0; --ani:#1868A0; --ani-soft:#DDEDF8;
+  --ok:#1C7C45; --ok-soft:#DDF2E5; --ng:#B42318; --ng-soft:#FBE3E0;
+  --radius:12px;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  --f-chem:"Figtree","Segoe UI","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F131B; --surface:#171D2A; --sunk:#1F2736; --ink:#E7EBF3; --muted:#9BA4B8; --line:#2B3448;
+    --accent:#93A2FF; --accent-ink:#0F131B; --accent-soft:#252E55;
+    --cat:#F2895F; --cat-soft:#3A2219; --ani:#6DB6EA; --ani-soft:#172E40;
+    --ok:#5CCB8A; --ok-soft:#17311F; --ng:#FF8A7E; --ng-soft:#3A1C1A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F131B; --surface:#171D2A; --sunk:#1F2736; --ink:#E7EBF3; --muted:#9BA4B8; --line:#2B3448;
+  --accent:#93A2FF; --accent-ink:#0F131B; --accent-soft:#252E55;
+  --cat:#F2895F; --cat-soft:#3A2219; --ani:#6DB6EA; --ani-soft:#172E40;
+  --ok:#5CCB8A; --ok-soft:#17311F; --ng:#FF8A7E; --ng-soft:#3A1C1A;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.7 var(--f-body);-webkit-text-size-adjust:100%}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.3;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chem{font-family:var(--f-chem);font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.chem sub{font-size:.68em;vertical-align:-.3em;line-height:0}
+.chem sup{font-size:.68em;vertical-align:.62em;line-height:0}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px;padding-bottom:12px}
+.logo{display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo-mark{display:flex;gap:2px;font-family:var(--f-chem);font-weight:700;font-size:13px}
+.logo-mark span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center}
+.logo-mark .c{background:var(--cat-soft);color:var(--cat)}
+.logo-mark .a{background:var(--ani-soft);color:var(--ani)}
+.logo h1{font-size:19px}
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+.tab{border:0;background:transparent;padding:6px 14px;border-radius:999px;cursor:pointer;font-weight:700;font-size:14px;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+section.view{padding-top:24px}
+.lead{color:var(--muted);margin:6px 0 0;max-width:40em}
+
+/* setup */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;gap:18px;margin-top:18px}
+.field-label{font-weight:700;font-size:13px;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--line);border-radius:999px;cursor:pointer;font-weight:500;background:var(--surface);user-select:none}
+.chip input:checked + span{border-color:var(--accent);background:var(--accent-soft);color:var(--ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+.chip input:disabled + span{opacity:.45;cursor:not-allowed}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-size:15px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{padding:7px 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:6px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px 20px;margin-top:14px;text-align:center}
+.qkind{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.qprompt{font-size:clamp(30px,7vw,46px);margin:10px 0 4px;font-family:var(--f-display);font-weight:700;line-height:1.3}
+.qprompt .chem{font-size:1.08em}
+.qprompt.jp{font-size:clamp(24px,5.5vw,34px)}
+.qask{color:var(--muted);margin:0}
+.combo{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.ion{display:inline-flex;align-items:baseline;padding:2px 14px;border-radius:12px}
+.ion.c{background:var(--cat-soft);color:var(--cat)}
+.ion.a{background:var(--ani-soft);color:var(--ani)}
+.plus{color:var(--muted);font-size:.7em}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+@media (max-width:520px){.choices{grid-template-columns:1fr}}
+.choice{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:14px 12px;font-size:19px;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;min-height:58px}
+.choice .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--sunk);font:700 12px/24px var(--f-chem);text-align:center;color:var(--muted)}
+.choice .t{flex:1}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice.right{border-color:var(--ok);background:var(--ok-soft)}
+.choice.wrong{border-color:var(--ng);background:var(--ng-soft)}
+.choice:disabled{cursor:default}
+.feedback{margin-top:14px;padding:14px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)}
+.feedback.ng{background:var(--ng-soft);color:var(--ng)}
+.feedback b{font-size:17px}
+.feedback .ans{color:var(--ink)}
+.reveal{margin-top:16px;display:grid;gap:12px;justify-items:center}
+.reveal .answer{font-size:clamp(26px,6vw,38px);font-family:var(--f-display);font-weight:700}
+.selfgrade{display:flex;gap:10px}
+.selfgrade .btn{min-width:130px}
+.btn.okb{background:var(--ok);color:var(--surface)}
+.btn.ngb{background:var(--ng);color:var(--surface)}
+
+/* result */
+.score{display:flex;align-items:baseline;gap:8px;font-family:var(--f-display);font-variant-numeric:tabular-nums}
+.score b{font-size:56px;line-height:1}
+.miss{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.miss li{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.miss .q{color:var(--muted)}
+.miss .a{font-weight:700;font-size:17px}
+
+/* table */
+.tablebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.scroll{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table.grid{border-collapse:collapse;min-width:980px;width:100%;font-size:13px}
+.grid th,.grid td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 6px;text-align:center;vertical-align:middle}
+.grid thead th{background:var(--cat-soft);position:sticky;top:0}
+.grid thead th.corner{background:var(--sunk)}
+.grid tbody th{background:var(--ani-soft);text-align:left;white-space:nowrap}
+.grid .hf{font-size:17px;display:block}
+.grid thead .hf{color:var(--cat)}
+.grid tbody th .hf{color:var(--ani)}
+.grid .hn{font-size:11px;color:var(--muted);font-weight:500;display:block;line-height:1.35}
+.grid td .f{font-size:17px;display:block}
+.grid td .nm{font-size:11.5px;display:block;line-height:1.35;color:var(--muted)}
+.grid td.none{color:var(--muted);font-size:12px}
+.grp{writing-mode:vertical-rl;font-size:11px;letter-spacing:.2em;color:var(--muted);background:var(--sunk);width:22px;padding:6px 2px!important}
+.cover{cursor:pointer;border-radius:6px;background:var(--sunk);color:var(--sunk);display:inline-block;min-width:70%;transition:background .15s,color .15s}
+.cover.open{background:transparent;color:inherit}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+
+/* test sheet */
+.sheet{background:#FFFFFF;color:#111;border:1px solid var(--line);border-radius:6px;padding:28px 26px;margin-top:18px}
+.sheet .chem{color:#111}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:2px solid #111;padding-bottom:10px}
+.sheet-head h2{font-size:21px}
+.sheet-head .sub{font-size:12px;color:#555}
+.namebox{display:flex;gap:6px;font-size:13px;align-items:flex-end;flex-wrap:wrap}
+.namebox span{border-bottom:1px solid #111;display:inline-block;min-width:34px;height:24px}
+.namebox span.w{min-width:130px}
+.sheet h3{font-size:15px;margin:20px 0 6px;padding:3px 10px;background:#EEF0F4;border-radius:4px}
+.sheet ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+@media (max-width:620px){.sheet ol{grid-template-columns:1fr}}
+.sheet li{display:flex;align-items:flex-end;gap:8px;padding:10px 0 4px;border-bottom:1px dashed #BBB;min-height:48px;break-inside:avoid}
+.sheet li .no{font:700 13px var(--f-chem);color:#555;width:26px;flex:none;font-variant-numeric:tabular-nums}
+.sheet li .p{flex:none;font-size:17px}
+.sheet li .blank{flex:1;text-align:center;color:#C0392B;font-weight:700;font-size:16px;min-height:1.6em}
+.sheet li .arrow{color:#888;flex:none}
+.sheet.show-ans li .blank{visibility:visible}
+.sheet:not(.show-ans) li .blank{visibility:hidden}
+.sheet .ion.c,.sheet .ion.a{background:transparent;padding:0 2px;color:#111}
+.printonly{display:none}
+.note{font-size:13px;color:var(--muted)}
+
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff}
+  .top,.noprint,.tablebar{display:none!important}
+  .wrap{max-width:none;padding:0}
+  section.view{padding:0}
+  .sheet{border:0;padding:0;margin:0}
+  .sheet ol{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="logo">
+      <div class="logo-mark" aria-hidden="true"><span class="c">+</span><span class="a">−</span></div>
+      <h1>イオンと化合物ドリル</h1>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-quiz" data-view="quiz" aria-selected="true">れんしゅう</button>
+      <button class="tab" role="tab" id="tab-table" data-view="table" aria-selected="false">一覧表</button>
+      <button class="tab" role="tab" id="tab-test" data-view="test" aria-selected="false">テスト用紙</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- ========== れんしゅう ========== -->
+  <section class="view" id="view-quiz">
+    <div id="quiz-setup">
+      <h2>問題をえらんでスタート</h2>
+      <p class="lead">イオン式・化学式と名前を、4択か「紙に書いてから答え合わせ」でれんしゅうします。まちがえた問題は「苦手」に記録されます。</p>
+      <div class="panel">
+        <div>
+          <p class="field-label">出題する問題</p>
+          <div class="chips" id="q-types"></div>
+        </div>
+        <div>
+          <p class="field-label">イオンのしぼりこみ</p>
+          <div class="chips" id="q-scope">
+            <label class="chip"><input type="radio" name="scope" id="scope-all" value="all" checked><span>ぜんぶ</span></label>
+            <label class="chip"><input type="radio" name="scope" id="scope-mono" value="単原子"><span>単原子イオンだけ</span></label>
+            <label class="chip"><input type="radio" name="scope" id="scope-poly" value="多原子"><span>多原子イオンだけ</span></label>
+            <label class="chip"><input type="radio" name="scope" id="scope-weak" value="weak"><span id="weak-label">苦手な問題だけ</span></label>
+          </div>
+        </div>
+        <div>
+          <p class="field-label">答え方</p>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="mode" id="mode-choice" value="choice" checked><span>4択</span></label>
+            <label class="chip"><input type="radio" name="mode" id="mode-self" value="self"><span>紙に書いて答え合わせ</span></label>
+          </div>
+        </div>
+        <div>
+          <p class="field-label">問題数</p>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="count" id="count-10" value="10" checked><span>10問</span></label>
+            <label class="chip"><input type="radio" name="count" id="count-20" value="20"><span>20問</span></label>
+            <label class="chip"><input type="radio" name="count" id="count-all" value="0"><span>ぜんぶ</span></label>
+          </div>
+          <p class="hint" id="pool-info"></p>
+        </div>
+        <div class="actions">
+          <button class="btn" id="start">スタート</button>
+          <button class="btn ghost small" id="clear-weak" hidden>苦手の記録を消す</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="quiz-play" hidden>
+      <div class="qhead">
+        <span id="q-count">1 / 10</span>
+        <div class="bar"><i id="q-bar" style="width:0"></i></div>
+        <button class="btn ghost small" id="quit">やめる</button>
+      </div>
+      <div class="qcard">
+        <div class="qkind" id="q-kind"></div>
+        <div class="qprompt" id="q-prompt"></div>
+        <p class="qask" id="q-ask"></p>
+      </div>
+      <div class="choices" id="q-choices"></div>
+      <div class="reveal" id="q-reveal" hidden></div>
+      <div id="q-feedback"></div>
+    </div>
+
+    <div id="quiz-result" hidden>
+      <h2>おつかれさま！</h2>
+      <div class="panel">
+        <div class="score"><b id="r-score">0</b><span id="r-total">/ 10 問正解</span></div>
+        <p class="hint" id="r-msg"></p>
+        <div id="r-miss-wrap">
+          <p class="field-label">まちがえた問題</p>
+          <ul class="miss" id="r-miss"></ul>
+        </div>
+        <div class="actions">
+          <button class="btn" id="retry-miss">まちがえた問題をもう一度</button>
+          <button class="btn ghost" id="back-setup">問題えらびにもどる</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 一覧表 ========== -->
+  <section class="view" id="view-table" hidden>
+    <h2>イオンと化合物の一覧表</h2>
+    <p class="lead">かくしたマスはタップすると答えが出ます。暗記チェックに使ってください。</p>
+    <div class="tablebar">
+      <div class="chips">
+        <label class="chip"><input type="radio" name="hide" id="hide-none" value="none" checked><span>ぜんぶ見る</span></label>
+        <label class="chip"><input type="radio" name="hide" id="hide-name" value="name"><span>名前をかくす</span></label>
+        <label class="chip"><input type="radio" name="hide" id="hide-formula" value="formula"><span>化学式をかくす</span></label>
+      </div>
+      <button class="btn ghost small" id="open-all">かくしたマスを全部ひらく</button>
+    </div>
+    <div class="scroll"><table class="grid" id="grid"></table></div>
+    <p class="legend" style="margin-top:10px"><span><i style="background:var(--cat-soft)"></i>陽イオン（＋）</span><span><i style="background:var(--ani-soft)"></i>陰イオン（－）</span><span>「—」は化合物をつくらない組み合わせ（NH<sub>3</sub>＋H<sub>2</sub>Oになる）</span></p>
+  </section>
+
+  <!-- ========== テスト用紙 ========== -->
+  <section class="view" id="view-test" hidden>
+    <div class="noprint">
+      <h2>テスト用紙をつくる</h2>
+      <p class="lead">問題はランダムにえらばれます。「もう一度つくる」を押すたびに別のテストになります。</p>
+      <div class="panel">
+        <div>
+          <p class="field-label">出題する問題</p>
+          <div class="chips" id="t-types"></div>
+        </div>
+        <div>
+          <p class="field-label">1種類あたりの問題数</p>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="tcount" id="tcount-6" value="6"><span>6問</span></label>
+            <label class="chip"><input type="radio" name="tcount" id="tcount-10" value="10" checked><span>10問</span></label>
+            <label class="chip"><input type="radio" name="tcount" id="tcount-16" value="16"><span>16問</span></label>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="make-test">もう一度つくる</button>
+          <label class="chip"><input type="checkbox" id="show-ans"><span>解答を表示</span></label>
+          <button class="btn ghost" id="print-test" hidden>印刷する</button>
+        </div>
+      </div>
+    </div>
+    <div class="sheet" id="sheet"></div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ---------- 表示用ヘルパー ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+// "Al2(SO4)3" → Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>
+function chem(f){return '<span class="chem">'+esc(f).replace(/(\d+)/g,"<sub>$1</sub>")+"</span>";}
+function chargeHTML(c){return "<sup>"+esc(c).replace(/-/g,"−")+"</sup>";}
+function ionHTML(ion){return '<span class="chem">'+esc(ion.formula).replace(/(\d+)/g,"<sub>$1</sub>")+chargeHTML(ion.charge)+"</span>";}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function sample(a,n){return shuffle(a).slice(0,n);}
+
+var store={
+  get:function(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}},
+  set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+};
+
+/* ---------- 問題の種類 ---------- */
+var TYPES=[
+  {id:"ionName",  label:"イオン式 → 名前",   kind:"イオンの名前", ask:"このイオンの名前は？"},
+  {id:"nameIon",  label:"名前 → イオン式",   kind:"イオン式",     ask:"このイオンのイオン式は？"},
+  {id:"cmpName",  label:"化学式 → 名前",     kind:"物質の名前",   ask:"この物質の名前は？"},
+  {id:"nameCmp",  label:"名前 → 化学式",     kind:"化学式",       ask:"この物質の化学式は？"},
+  {id:"combine",  label:"イオンの組み合わせ → 化学式", kind:"組み合わせ", ask:"この2つのイオンでできる物質の化学式は？"}
+];
+var TYPE_BY_ID={};TYPES.forEach(function(t){TYPE_BY_ID[t.id]=t;});
+
+var CAT_BY_ID={},ANI_BY_ID={};
+CATIONS.forEach(function(c){c.sign="+";CAT_BY_ID[c.id]=c;});
+ANIONS.forEach(function(a){a.sign="-";ANI_BY_ID[a.id]=a;});
+var ALL_IONS=CATIONS.concat(ANIONS);
+
+// 化合物リスト
+var CMPS=[];
+ANIONS.forEach(function(a){
+  var row=COMPOUNDS[a.id]||{};
+  CATIONS.forEach(function(c){
+    var v=row[c.id];
+    if(v) CMPS.push({formula:v[0],name:v[1],cat:c,ani:a});
+  });
+});
+
+/* ---------- まちがい選択肢づくり ---------- */
+function chargeNum(ch){var m=/(\d)/.exec(ch);return m?+m[1]:1;}
+function isPoly(ion){return /[A-Z].*[A-Z]/.test(ion.formula)||/\d/.test(ion.formula);}
+function part(ion,n){if(n===1)return ion.formula;return (isPoly(ion)?"("+ion.formula+")":ion.formula)+n;}
+// 数の比をわざと変えた化学式
+function ratioVariants(c,a,correct){
+  var pairs=[[1,1],[1,2],[2,1],[1,3],[3,1],[2,3],[3,2]];
+  var out=[];
+  pairs.forEach(function(p){
+    var f=part(c,p[0])+part(a,p[1]);
+    if(f!==correct&&out.indexOf(f)<0)out.push(f);
+  });
+  // 多原子イオンのかっこ忘れ
+  if(/\)\d/.test(correct)){var nob=correct.replace(/\(([^)]+)\)(\d)/g,"$1$2");if(nob!==correct&&out.indexOf(nob)<0)out.unshift(nob);}
+  return out;
+}
+function pickOthers(pool,correctKey,n){
+  var seen={};seen[correctKey]=1;var out=[];
+  shuffle(pool).forEach(function(x){if(out.length<n&&!seen[x.key]){seen[x.key]=1;out.push(x);}});
+  return out;
+}
+function chargeVariants(ion){
+  var set=ion.sign==="+"?["+","2+","3+"]:["-","2-","3-"];
+  return set.filter(function(c){return c!==ion.charge;}).map(function(c){return {formula:ion.formula,charge:c};});
+}
+
+/* ---------- 問題バンク ---------- */
+function buildBank(){
+  var bank=[];
+  ALL_IONS.forEach(function(ion){
+    var group=ion.sign==="+"?"陽イオン":ion.group;
+    var same=ALL_IONS.filter(function(x){return x.sign===ion.sign&&x!==ion;});
+    bank.push({qid:"ionName:"+ion.id,type:"ionName",groups:[group],
+      prompt:ionHTML(ion),promptJP:false,answerKey:ion.name,answer:esc(ion.name),
+      distract:function(){return pickOthers(same.map(function(x){return {key:x.name,html:esc(x.name)};}),ion.name,3);}});
+    bank.push({qid:"nameIon:"+ion.id,type:"nameIon",groups:[group],
+      prompt:esc(ion.name),promptJP:true,answerKey:ion.formula+ion.charge,answer:ionHTML(ion),
+      distract:function(){
+        var cv=sample(chargeVariants(ion),2).map(function(v){return {key:v.formula+v.charge,html:ionHTML(v)};});
+        var other=pickOthers(same.map(function(x){return {key:x.formula+x.charge,html:ionHTML(x)};}),ion.formula+ion.charge,3-cv.length);
+        return cv.concat(other);
+      }});
+  });
+  var seenName={};
+  CMPS.forEach(function(m){
+    var groups=["陽イオン",m.ani.group];
+    var related=CMPS.filter(function(x){return x!==m&&(x.cat===m.cat||x.ani===m.ani);});
+    var formulaDistract=function(){
+      var rv=(m.cat.id==="H"&&(m.ani.id==="O"||m.ani.id==="OH"))?[]:ratioVariants(m.cat,m.ani,m.formula);
+      var picks=sample(rv,Math.min(2,rv.length)).map(function(f){return {key:f,html:chem(f)};});
+      var keys={};keys[m.formula]=1;picks.forEach(function(p){keys[p.key]=1;});
+      var rest=shuffle(related).filter(function(x){if(keys[x.formula])return false;keys[x.formula]=1;return true;})
+        .slice(0,3-picks.length).map(function(x){return {key:x.formula,html:chem(x.formula)};});
+      return picks.concat(rest);
+    };
+    if(!seenName[m.formula]){
+      seenName[m.formula]=1;
+      bank.push({qid:"cmpName:"+m.formula,type:"cmpName",groups:groups,
+        prompt:chem(m.formula),promptJP:false,answerKey:m.name,answer:esc(m.name),
+        distract:function(){return pickOthers(related.map(function(x){return {key:x.name,html:esc(x.name)};}),m.name,3);}});
+      bank.push({qid:"nameCmp:"+m.formula,type:"nameCmp",groups:groups,
+        prompt:esc(m.name),promptJP:true,answerKey:m.formula,answer:chem(m.formula),distract:formulaDistract});
+    }
+    bank.push({qid:"combine:"+m.cat.id+"-"+m.ani.id,type:"combine",groups:groups,
+      prompt:'<span class="combo"><span class="ion c">'+ionHTML(m.cat)+'</span><span class="plus">と</span><span class="ion a">'+ionHTML(m.ani)+"</span></span>",
+      promptJP:false,answerKey:m.formula,answer:chem(m.formula),note:m.name,distract:formulaDistract});
+  });
+  return bank;
+}
+var BANK=buildBank();
+var BANK_BY_ID={};BANK.forEach(function(q){BANK_BY_ID[q.qid]=q;});
+
+/* ---------- 苦手の記録 ---------- */
+var weak=store.get("ionquiz_weak",{});
+function saveWeak(){store.set("ionquiz_weak",weak);}
+
+/* ---------- タブ ---------- */
+var $=function(id){return document.getElementById(id);};
+function showView(name){
+  document.querySelectorAll(".tab").forEach(function(t){t.setAttribute("aria-selected",t.dataset.view===name?"true":"false");});
+  ["quiz","table","test"].forEach(function(v){$("view-"+v).hidden=v!==name;});
+  store.set("ionquiz_tab",name);
+}
+document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){showView(t.dataset.view);});});
+
+/* ---------- れんしゅう：設定 ---------- */
+function typeChips(container,prefix,defaults){
+  container.innerHTML=TYPES.map(function(t){
+    return '<label class="chip"><input type="checkbox" id="'+prefix+"-"+t.id+'" value="'+t.id+'"'+(defaults.indexOf(t.id)>=0?" checked":"")+"><span>"+esc(t.label)+"</span></label>";
+  }).join("");
+}
+typeChips($("q-types"),"qt",["ionName","nameIon","cmpName","nameCmp"]);
+function checked(container){return Array.prototype.map.call(container.querySelectorAll("input:checked"),function(i){return i.value;});}
+function radio(name){var el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:null;}
+
+function currentPool(){
+  var types=checked($("q-types"));var scope=radio("scope");
+  return BANK.filter(function(q){
+    if(types.indexOf(q.type)<0)return false;
+    if(scope==="weak")return !!weak[q.qid];
+    if(scope==="単原子"||scope==="多原子"){
+      if(q.type==="ionName"||q.type==="nameIon")return q.groups[0]===scope;
+      return q.groups.indexOf(scope)>=0;
+    }
+    return true;
+  });
+}
+function refreshSetup(){
+  var nWeak=Object.keys(weak).length;
+  $("weak-label").textContent="苦手な問題だけ（"+nWeak+"問）";
+  $("scope-weak").disabled=nWeak===0;
+  if(nWeak===0&&$("scope-weak").checked)$("scope-all").checked=true;
+  $("clear-weak").hidden=nWeak===0;
+  var pool=currentPool();
+  $("pool-info").textContent="えらんだ条件で出せる問題："+pool.length+"問";
+  $("start").disabled=pool.length===0;
+}
+$("quiz-setup").addEventListener("change",refreshSetup);
+$("clear-weak").addEventListener("click",function(){weak={};saveWeak();refreshSetup();});
+
+/* ---------- れんしゅう：出題 ---------- */
+var run=null;
+function startRun(questions){
+  run={qs:questions,i:0,score:0,miss:[],mode:radio("mode")};
+  $("quiz-setup").hidden=true;$("quiz-result").hidden=true;$("quiz-play").hidden=false;
+  renderQ();
+}
+$("start").addEventListener("click",function(){
+  var pool=shuffle(currentPool());var n=+radio("count");
+  startRun(n?pool.slice(0,n):pool);
+});
+$("quit").addEventListener("click",backToSetup);
+function backToSetup(){run=null;$("quiz-play").hidden=true;$("quiz-result").hidden=true;$("quiz-setup").hidden=false;refreshSetup();}
+
+function renderQ(){
+  var q=run.qs[run.i];var t=TYPE_BY_ID[q.type];
+  $("q-count").textContent=(run.i+1)+" / "+run.qs.length;
+  $("q-bar").style.width=(run.i/run.qs.length*100)+"%";
+  $("q-kind").textContent=t.kind;
+  $("q-prompt").innerHTML=q.prompt;
+  $("q-prompt").className="qprompt"+(q.promptJP?" jp":"");
+  $("q-ask").textContent=t.ask;
+  $("q-feedback").innerHTML="";
+  var ch=$("q-choices"),rv=$("q-reveal");
+  if(run.mode==="choice"){
+    rv.hidden=true;ch.hidden=false;
+    var opts=shuffle([{key:q.answerKey,html:q.answer}].concat(q.distract()));
+    ch.innerHTML=opts.map(function(o,i){
+      return '<button class="choice" data-key="'+esc(o.key)+'"><span class="n">'+(i+1)+'</span><span class="t">'+o.html+"</span></button>";
+    }).join("");
+    ch.querySelectorAll(".choice").forEach(function(b){b.addEventListener("click",function(){answerChoice(b);});});
+  }else{
+    ch.hidden=true;rv.hidden=false;
+    rv.innerHTML='<p class="note">ノートに答えを書いてから押してね</p><button class="btn" id="show-answer">答えを見る</button>';
+    $("show-answer").addEventListener("click",function(){
+      rv.innerHTML='<div class="answer">'+q.answer+"</div>"+(q.note?'<div class="note">'+esc(q.note)+"</div>":"")+
+        '<div class="selfgrade"><button class="btn okb" id="sg-ok">○ できた</button><button class="btn ngb" id="sg-ng">× まちがえた</button></div>';
+      $("sg-ok").addEventListener("click",function(){grade(true);next();});
+      $("sg-ng").addEventListener("click",function(){grade(false);next();});
+      $("sg-ok").focus();
+    });
+  }
+}
+function grade(ok){
+  var q=run.qs[run.i];
+  if(ok){run.score++;if(weak[q.qid]){weak[q.qid]--;if(weak[q.qid]<=0)delete weak[q.qid];}}
+  else{run.miss.push(q);weak[q.qid]=2;} // まちがえた問題は2回正解するまで「苦手」に残る
+  saveWeak();
+}
+function answerChoice(btn){
+  var q=run.qs[run.i];var ok=btn.dataset.key===q.answerKey;
+  $("q-choices").querySelectorAll(".choice").forEach(function(b){
+    b.disabled=true;
+    if(b.dataset.key===q.answerKey)b.classList.add("right");
+  });
+  if(!ok)btn.classList.add("wrong");
+  grade(ok);
+  var last=run.i===run.qs.length-1;
+  $("q-feedback").innerHTML='<div class="feedback '+(ok?"ok":"ng")+'"><div><b>'+(ok?"○ 正解！":"× ざんねん")+"</b>"+
+    (ok?(q.note?' <span class="ans">'+esc(q.note)+"</span>":""):' <span class="ans">答え：'+q.answer+(q.note?"（"+esc(q.note)+"）":"")+"</span>")+
+    '</div><button class="btn small" id="next">'+(last?"結果を見る":"次へ")+"</button></div>";
+  $("next").addEventListener("click",next);$("next").focus();
+}
+function next(){
+  run.i++;
+  if(run.i>=run.qs.length)showResult();else renderQ();
+}
+document.addEventListener("keydown",function(e){
+  if(!run||$("quiz-play").hidden||$("view-quiz").hidden)return;
+  if(/^[1-4]$/.test(e.key)){var b=$("q-choices").querySelectorAll(".choice")[+e.key-1];if(b&&!b.disabled)b.click();}
+});
+function showResult(){
+  $("quiz-play").hidden=true;$("quiz-result").hidden=false;
+  var total=run.qs.length;
+  $("r-score").textContent=run.score;$("r-total").textContent="/ "+total+" 問正解";
+  var rate=run.score/total;
+  $("r-msg").textContent=rate===1?"全問正解！この調子。":rate>=.8?"あと少し。まちがえた問題を見なおそう。":"一覧表で確かめてから、もう一度チャレンジしよう。";
+  $("r-miss-wrap").hidden=run.miss.length===0;$("retry-miss").hidden=run.miss.length===0;
+  $("r-miss").innerHTML=run.miss.map(function(q){
+    return '<li><span class="q">'+q.prompt+"</span><span class=\"a\">"+q.answer+(q.note?' <span class="note">'+esc(q.note)+"</span>":"")+"</span></li>";
+  }).join("");
+  $("q-bar").style.width="100%";
+}
+$("retry-miss").addEventListener("click",function(){startRun(shuffle(run.miss));});
+$("back-setup").addEventListener("click",backToSetup);
+
+/* ---------- 一覧表 ---------- */
+function renderGrid(){
+  var hide=radio("hide");
+  var cover=function(inner,on){return on?'<span class="cover" role="button" tabindex="0">'+inner+"</span>":inner;};
+  var h='<thead><tr><th class="corner" colspan="2"></th>'+CATIONS.map(function(c){
+    return '<th><span class="hf">'+cover(ionHTML(c),hide==="formula")+'</span><span class="hn">'+cover(esc(c.name),hide==="name")+"</span></th>";
+  }).join("")+"</tr></thead><tbody>";
+  var groups=[];ANIONS.forEach(function(a){if(groups.indexOf(a.group)<0)groups.push(a.group);});
+  groups.forEach(function(g){
+    var rows=ANIONS.filter(function(a){return a.group===g;});
+    rows.forEach(function(a,ri){
+      h+="<tr>"+(ri===0?'<th class="grp" rowspan="'+rows.length+'">'+esc(g)+"イオン</th>":"")+
+        '<th><span class="hf">'+cover(ionHTML(a),hide==="formula")+'</span><span class="hn">'+cover(esc(a.name),hide==="name")+"</span></th>";
+      CATIONS.forEach(function(c){
+        var v=(COMPOUNDS[a.id]||{})[c.id];
+        if(!v){h+='<td class="none">—</td>';return;}
+        h+='<td><span class="f">'+cover(chem(v[0]),hide==="formula")+'</span><span class="nm">'+cover(esc(v[1]),hide==="name")+"</span></td>";
+      });
+      h+="</tr>";
+    });
+  });
+  $("grid").innerHTML=h+"</tbody>";
+}
+$("view-table").addEventListener("change",function(e){if(e.target.name==="hide")renderGrid();});
+$("grid").addEventListener("click",function(e){var c=e.target.closest(".cover");if(c)c.classList.toggle("open");});
+$("grid").addEventListener("keydown",function(e){var c=e.target.closest(".cover");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();c.classList.toggle("open");}});
+$("open-all").addEventListener("click",function(){$("grid").querySelectorAll(".cover").forEach(function(c){c.classList.add("open");});});
+
+/* ---------- テスト用紙 ---------- */
+typeChips($("t-types"),"tt",["ionName","nameIon","cmpName","nameCmp"]);
+var SECTION_TITLE={
+  ionName:"次のイオンの名前を書きなさい。",
+  nameIon:"次のイオンをイオン式で書きなさい。",
+  cmpName:"次の化学式で表される物質の名前を書きなさい。",
+  nameCmp:"次の物質を化学式で書きなさい。",
+  combine:"次の2つのイオンからできる物質の化学式を書きなさい。"
+};
+function makeTest(){
+  var types=checked($("t-types"));var n=+radio("tcount");
+  var roman=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ"];
+  var h='<div class="sheet-head"><div><h2>イオンと化合物 確認テスト</h2><div class="sub">イオン式・化学式と名前</div></div>'+
+    '<div class="namebox"><span></span>年<span></span>組<span></span>番　名前<span class="w"></span></div></div>';
+  if(!types.length)h+='<p class="note" style="margin-top:16px">出題する問題を1つ以上えらんでください。</p>';
+  var no=0;
+  types.forEach(function(t,ti){
+    var qs=sample(BANK.filter(function(q){return q.type===t;}),n);
+    h+="<h3>"+roman[ti]+"　"+SECTION_TITLE[t]+"</h3><ol>";
+    qs.forEach(function(q){
+      no++;
+      h+='<li><span class="no">('+no+')</span><span class="p">'+q.prompt+'</span><span class="arrow">→</span><span class="blank">'+q.answer+"</span></li>";
+    });
+    h+="</ol>";
+  });
+  $("sheet").innerHTML=h;
+  $("sheet").classList.toggle("show-ans",$("show-ans").checked);
+}
+$("make-test").addEventListener("click",makeTest);
+$("t-types").addEventListener("change",makeTest);
+document.querySelectorAll('input[name="tcount"]').forEach(function(r){r.addEventListener("change",makeTest);});
+$("show-ans").addEventListener("change",function(){$("sheet").classList.toggle("show-ans",$("show-ans").checked);});
+// 埋めこみ表示（iframe）では印刷できないので、ボタンは単独で開いたときだけ出す
+var topLevel=false;try{topLevel=window.self===window.top;}catch(e){}
+$("print-test").hidden=!topLevel;
+$("print-test").addEventListener("click",function(){window.print();});
+
+/* ---------- 起動 ---------- */
+refreshSetup();renderGrid();makeTest();
+var lastTab=store.get("ionquiz_tab","quiz");
+var hash=(location.hash||"").slice(1);
+showView(["quiz","table","test"].indexOf(hash)>=0?hash:(["quiz","table","test"].indexOf(lastTab)>=0?lastTab:"quiz"));
+})();
+</script>
+</body>
+</html>
