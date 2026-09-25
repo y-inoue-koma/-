@@ -144,36 +144,61 @@ table.grid{border-collapse:collapse;min-width:980px;width:100%;font-size:13px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
 
 /* test sheet */
-.sheet{background:#FFFFFF;color:#111;border:1px solid var(--line);border-radius:6px;padding:28px 26px;margin-top:18px}
-.sheet .chem{color:#111}
-.sheet-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:2px solid #111;padding-bottom:10px}
-.sheet-head h2{font-size:21px}
-.sheet-head .sub{font-size:12px;color:#555}
-.namebox{display:flex;gap:6px;font-size:13px;align-items:flex-end;flex-wrap:wrap}
-.namebox span{border-bottom:1px solid #111;display:inline-block;min-width:34px;height:24px}
-.namebox span.w{min-width:130px}
-.sheet h3{font-size:15px;margin:20px 0 6px;padding:3px 10px;background:#EEF0F4;border-radius:4px}
-.sheet ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
-@media (max-width:620px){.sheet ol{grid-template-columns:1fr}}
-.sheet li{display:flex;align-items:flex-end;gap:8px;padding:10px 0 4px;border-bottom:1px dashed #BBB;min-height:48px;break-inside:avoid}
-.sheet li .no{font:700 13px var(--f-chem);color:#555;width:26px;flex:none;font-variant-numeric:tabular-nums}
-.sheet li .p{flex:none;font-size:17px}
-.sheet li .blank{flex:1;text-align:center;color:#C0392B;font-weight:700;font-size:16px;min-height:1.6em}
-.sheet li .arrow{color:#888;flex:none}
-.sheet.show-ans li .blank{visibility:visible}
-.sheet:not(.show-ans) li .blank{visibility:hidden}
-.sheet .ion.c,.sheet .ion.a{background:transparent;padding:0 2px;color:#111}
-.printonly{display:none}
+.counts{display:grid}
+.count-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:8px;border-bottom:1px solid var(--line)}
+.count-row:last-child{border-bottom:0}
+.count-row .lbl{flex:1;min-width:11em;font-weight:500}
+.count-row.off .lbl{color:var(--muted)}
+.count-row .max{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:var(--sunk);width:40px;height:38px;font-size:18px;cursor:pointer;color:var(--ink)}
+.stepper input{width:54px;height:38px;border:0;text-align:center;font:600 17px var(--f-chem);background:var(--surface);color:var(--ink);-moz-appearance:textfield;appearance:textfield}
+.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.total{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.status{font-size:13px;color:var(--muted);min-height:1.4em;margin:0}
+.status.err{color:var(--ng)}
+.status a{color:var(--accent);font-weight:700}
 .note{font-size:13px;color:var(--muted)}
 
+.pages{margin-top:18px;display:grid;gap:16px;justify-items:center}
+.page-slot{overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.2);border-radius:2px;background:#fff}
+#measure{position:absolute;left:-12000px;top:0;pointer-events:none}
+.page{width:210mm;height:297mm;padding:13mm 15mm 9mm;background:#FFFFFF;color:#111;display:flex;flex-direction:column;transform-origin:0 0;font-family:var(--f-body);box-sizing:border-box}
+.page .chem{color:#111}
+.pg-body{flex:1;min-height:0;overflow:hidden}
+.pg-foot{text-align:center;font:12px var(--f-chem);color:#666;padding-top:6px}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid #111;padding-bottom:10px}
+.sheet-head h2{font-size:21px}
+.sheet-head .sub{font-size:12px;color:#555}
+.cont-head{display:flex;justify-content:space-between;align-items:flex-end;font-size:12px;color:#555;border-bottom:1px solid #111;padding-bottom:4px}
+.namebox{display:flex;gap:6px;font-size:13px;align-items:flex-end}
+.namebox span{border-bottom:1px solid #111;display:inline-block;min-width:34px;height:24px}
+.namebox span.w{min-width:130px}
+.ans-badge{display:inline-block;color:#C0392B;border:1.5px solid #C0392B;padding:0 8px;border-radius:4px;font-size:13px;font-weight:700;margin-left:8px;vertical-align:3px}
+.sec-h{font-family:var(--f-display);font-size:15px;margin:0;padding-top:14px;padding-bottom:4px}
+.sec-h span{display:block;padding:3px 10px;background:#EEF0F4;border-radius:4px}
+.sec-h small{font-weight:500;color:#666;font-size:12px}
+.qrow{display:grid;grid-template-columns:1fr 1fr;column-gap:26px}
+.q{display:flex;align-items:flex-end;gap:8px;padding:10px 0 4px;border-bottom:1px dashed #BBB;min-height:50px}
+.q .no{font:700 13px var(--f-chem);color:#555;width:28px;flex:none;font-variant-numeric:tabular-nums}
+.q .p{flex:none;font-size:17px}
+.q .arrow{color:#888;flex:none}
+.q .blank{flex:1;text-align:center;color:#C0392B;font-weight:700;font-size:16px;min-height:1.6em;visibility:hidden}
+.page.answers .q .blank{visibility:visible}
+.q .ion.c,.q .ion.a{background:transparent;padding:0 2px;color:#111}
+.q .combo{gap:4px;flex-wrap:nowrap}
+
 @media print{
-  @page{size:A4;margin:14mm}
-  body{background:#fff}
-  .top,.noprint,.tablebar{display:none!important}
-  .wrap{max-width:none;padding:0}
-  section.view{padding:0}
-  .sheet{border:0;padding:0;margin:0}
-  .sheet ol{grid-template-columns:1fr 1fr}
+  @page{size:A4;margin:0}
+  :root{padding:0!important}
+  html,body{background:#fff!important}
+  .top,.noprint,#view-quiz,#view-table{display:none!important}
+  #view-test{display:block!important;padding:0}
+  .wrap{max-width:none;padding:0!important}
+  .pages{display:block;margin:0}
+  .page-slot{width:auto!important;height:auto!important;box-shadow:none;border-radius:0;overflow:visible}
+  .page{transform:none!important;break-after:page;page-break-after:always}
+  .page-slot:last-child .page{break-after:auto;page-break-after:auto}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -289,28 +314,30 @@ table.grid{border-collapse:collapse;min-width:980px;width:100%;font-size:13px}
   <section class="view" id="view-test" hidden>
     <div class="noprint">
       <h2>テスト用紙をつくる</h2>
-      <p class="lead">問題はランダムにえらばれます。「もう一度つくる」を押すたびに別のテストになります。</p>
+      <p class="lead">問題はランダムにえらばれます。A4サイズで自動でページ分けするので、問題や見出しの途中でページが切れることはありません。</p>
       <div class="panel">
         <div>
-          <p class="field-label">出題する問題</p>
-          <div class="chips" id="t-types"></div>
+          <p class="field-label">問題の種類と問題数（0にすると出題しません）</p>
+          <div class="counts" id="t-counts"></div>
+          <p class="hint">合計 <span class="total" id="t-total">0</span> 問</p>
         </div>
         <div>
-          <p class="field-label">1種類あたりの問題数</p>
+          <p class="field-label">つくるもの</p>
           <div class="chips">
-            <label class="chip"><input type="radio" name="tcount" id="tcount-6" value="6"><span>6問</span></label>
-            <label class="chip"><input type="radio" name="tcount" id="tcount-10" value="10" checked><span>10問</span></label>
-            <label class="chip"><input type="radio" name="tcount" id="tcount-16" value="16"><span>16問</span></label>
+            <label class="chip"><input type="radio" name="tout" id="tout-both" value="both" checked><span>問題用紙＋解答</span></label>
+            <label class="chip"><input type="radio" name="tout" id="tout-q" value="q"><span>問題用紙だけ</span></label>
+            <label class="chip"><input type="radio" name="tout" id="tout-a" value="a"><span>解答だけ</span></label>
           </div>
         </div>
         <div class="actions">
-          <button class="btn" id="make-test">もう一度つくる</button>
-          <label class="chip"><input type="checkbox" id="show-ans"><span>解答を表示</span></label>
+          <button class="btn" id="pdf-test">PDFをダウンロード</button>
           <button class="btn ghost" id="print-test" hidden>印刷する</button>
+          <button class="btn ghost" id="make-test">問題を入れかえる</button>
         </div>
+        <p class="status" id="t-status" aria-live="polite"></p>
       </div>
     </div>
-    <div class="sheet" id="sheet"></div>
+    <div class="pages" id="pages"></div>
   </section>
 </main>
 
@@ -339,7 +366,8 @@ var TYPES=[
   {id:"nameIon",  label:"名前 → イオン式",   kind:"イオン式",     ask:"このイオンのイオン式は？"},
   {id:"cmpName",  label:"化学式 → 名前",     kind:"物質の名前",   ask:"この物質の名前は？"},
   {id:"nameCmp",  label:"名前 → 化学式",     kind:"化学式",       ask:"この物質の化学式は？"},
-  {id:"combine",  label:"イオンの組み合わせ → 化学式", kind:"組み合わせ", ask:"この2つのイオンでできる物質の化学式は？"}
+  {id:"combine",  label:"イオンの組み合わせ → 化学式", kind:"組み合わせ（化学式）", ask:"この2つのイオンでできる物質の化学式は？"},
+  {id:"combineName", label:"イオンの組み合わせ → 名前", kind:"組み合わせ（名前）", ask:"この2つのイオンでできる物質の名前は？"}
 ];
 var TYPE_BY_ID={};TYPES.forEach(function(t){TYPE_BY_ID[t.id]=t;});
 
@@ -421,9 +449,12 @@ function buildBank(){
       bank.push({qid:"nameCmp:"+m.formula,type:"nameCmp",groups:groups,
         prompt:esc(m.name),promptJP:true,answerKey:m.formula,answer:chem(m.formula),distract:formulaDistract});
     }
+    var pair='<span class="combo"><span class="ion c">'+ionHTML(m.cat)+'</span><span class="plus">と</span><span class="ion a">'+ionHTML(m.ani)+"</span></span>";
     bank.push({qid:"combine:"+m.cat.id+"-"+m.ani.id,type:"combine",groups:groups,
-      prompt:'<span class="combo"><span class="ion c">'+ionHTML(m.cat)+'</span><span class="plus">と</span><span class="ion a">'+ionHTML(m.ani)+"</span></span>",
-      promptJP:false,answerKey:m.formula,answer:chem(m.formula),note:m.name,distract:formulaDistract});
+      prompt:pair,promptJP:false,answerKey:m.formula,answer:chem(m.formula),note:esc(m.name),distract:formulaDistract});
+    bank.push({qid:"combineName:"+m.cat.id+"-"+m.ani.id,type:"combineName",groups:groups,
+      prompt:pair,promptJP:false,answerKey:m.name,answer:esc(m.name),note:chem(m.formula),
+      distract:function(){return pickOthers(related.map(function(x){return {key:x.name,html:esc(x.name)};}),m.name,3);}});
   });
   return bank;
 }
@@ -440,6 +471,7 @@ function showView(name){
   document.querySelectorAll(".tab").forEach(function(t){t.setAttribute("aria-selected",t.dataset.view===name?"true":"false");});
   ["quiz","table","test"].forEach(function(v){$("view-"+v).hidden=v!==name;});
   store.set("ionquiz_tab",name);
+  if(name==="test"&&typeof fitPages==="function")fitPages();
 }
 document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){showView(t.dataset.view);});});
 
@@ -513,7 +545,7 @@ function renderQ(){
     ch.hidden=true;rv.hidden=false;
     rv.innerHTML='<p class="note">ノートに答えを書いてから押してね</p><button class="btn" id="show-answer">答えを見る</button>';
     $("show-answer").addEventListener("click",function(){
-      rv.innerHTML='<div class="answer">'+q.answer+"</div>"+(q.note?'<div class="note">'+esc(q.note)+"</div>":"")+
+      rv.innerHTML='<div class="answer">'+q.answer+"</div>"+(q.note?'<div class="note">'+q.note+"</div>":"")+
         '<div class="selfgrade"><button class="btn okb" id="sg-ok">○ できた</button><button class="btn ngb" id="sg-ng">× まちがえた</button></div>';
       $("sg-ok").addEventListener("click",function(){grade(true);next();});
       $("sg-ng").addEventListener("click",function(){grade(false);next();});
@@ -537,7 +569,7 @@ function answerChoice(btn){
   grade(ok);
   var last=run.i===run.qs.length-1;
   $("q-feedback").innerHTML='<div class="feedback '+(ok?"ok":"ng")+'"><div><b>'+(ok?"○ 正解！":"× ざんねん")+"</b>"+
-    (ok?(q.note?' <span class="ans">'+esc(q.note)+"</span>":""):' <span class="ans">答え：'+q.answer+(q.note?"（"+esc(q.note)+"）":"")+"</span>")+
+    (ok?(q.note?' <span class="ans">'+q.note+"</span>":""):' <span class="ans">答え：'+q.answer+(q.note?"（"+q.note+"）":"")+"</span>")+
     '</div><button class="btn small" id="next">'+(last?"結果を見る":"次へ")+"</button></div>";
   $("next").addEventListener("click",next);$("next").focus();
 }
@@ -557,7 +589,7 @@ function showResult(){
   $("r-msg").textContent=rate===1?"全問正解！この調子。":rate>=.8?"あと少し。まちがえた問題を見なおそう。":"一覧表で確かめてから、もう一度チャレンジしよう。";
   $("r-miss-wrap").hidden=run.miss.length===0;$("retry-miss").hidden=run.miss.length===0;
   $("r-miss").innerHTML=run.miss.map(function(q){
-    return '<li><span class="q">'+q.prompt+"</span><span class=\"a\">"+q.answer+(q.note?' <span class="note">'+esc(q.note)+"</span>":"")+"</span></li>";
+    return '<li><span class="q">'+q.prompt+"</span><span class=\"a\">"+q.answer+(q.note?' <span class="note">'+q.note+"</span>":"")+"</span></li>";
   }).join("");
   $("q-bar").style.width="100%";
 }
@@ -593,44 +625,205 @@ $("grid").addEventListener("keydown",function(e){var c=e.target.closest(".cover"
 $("open-all").addEventListener("click",function(){$("grid").querySelectorAll(".cover").forEach(function(c){c.classList.add("open");});});
 
 /* ---------- テスト用紙 ---------- */
-typeChips($("t-types"),"tt",["ionName","nameIon","cmpName","nameCmp"]);
 var SECTION_TITLE={
   ionName:"次のイオンの名前を書きなさい。",
   nameIon:"次のイオンをイオン式で書きなさい。",
   cmpName:"次の化学式で表される物質の名前を書きなさい。",
   nameCmp:"次の物質を化学式で書きなさい。",
-  combine:"次の2つのイオンからできる物質の化学式を書きなさい。"
+  combine:"次の2つのイオンからできる物質の化学式を書きなさい。",
+  combineName:"次の2つのイオンからできる物質の名前を書きなさい。"
 };
-function makeTest(){
-  var types=checked($("t-types"));var n=+radio("tcount");
-  var roman=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ"];
-  var h='<div class="sheet-head"><div><h2>イオンと化合物 確認テスト</h2><div class="sub">イオン式・化学式と名前</div></div>'+
-    '<div class="namebox"><span></span>年<span></span>組<span></span>番　名前<span class="w"></span></div></div>';
-  if(!types.length)h+='<p class="note" style="margin-top:16px">出題する問題を1つ以上えらんでください。</p>';
-  var no=0;
-  types.forEach(function(t,ti){
-    var qs=sample(BANK.filter(function(q){return q.type===t;}),n);
-    h+="<h3>"+roman[ti]+"　"+SECTION_TITLE[t]+"</h3><ol>";
-    qs.forEach(function(q){
-      no++;
-      h+='<li><span class="no">('+no+')</span><span class="p">'+q.prompt+'</span><span class="arrow">→</span><span class="blank">'+q.answer+"</span></li>";
-    });
-    h+="</ol>";
-  });
-  $("sheet").innerHTML=h;
-  $("sheet").classList.toggle("show-ans",$("show-ans").checked);
+var ROMAN=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ","Ⅷ","Ⅸ","Ⅹ"];
+var TEST_TITLE="イオンと化合物 確認テスト";
+var POOL_BY_TYPE={};TYPES.forEach(function(t){POOL_BY_TYPE[t.id]=BANK.filter(function(q){return q.type===t.id;});});
+var DEFAULT_COUNTS={ionName:10,nameIon:10,cmpName:10,nameCmp:10,combine:0,combineName:0};
+var tCounts=Object.assign({},DEFAULT_COUNTS,store.get("ionquiz_tcounts",{}));
+var testSel={}; // 種類ごとに出題する問題のqid
+
+function renderCounts(){
+  $("t-counts").innerHTML=TYPES.map(function(t){
+    var max=POOL_BY_TYPE[t.id].length;var v=Math.min(tCounts[t.id]||0,max);tCounts[t.id]=v;
+    return '<div class="count-row'+(v?"":" off")+'" data-type="'+t.id+'"><span class="lbl">'+esc(t.label)+'</span><span class="max">最大'+max+"問</span>"+
+      '<span class="stepper"><button type="button" data-d="-1" aria-label="へらす">−</button>'+
+      '<input type="number" id="tc-'+t.id+'" min="0" max="'+max+'" value="'+v+'" inputmode="numeric" aria-label="'+esc(t.label)+'の問題数">'+
+      '<button type="button" data-d="1" aria-label="ふやす">＋</button></span></div>';
+  }).join("");
+  updateTotal();
 }
-$("make-test").addEventListener("click",makeTest);
-$("t-types").addEventListener("change",makeTest);
-document.querySelectorAll('input[name="tcount"]').forEach(function(r){r.addEventListener("change",makeTest);});
-$("show-ans").addEventListener("change",function(){$("sheet").classList.toggle("show-ans",$("show-ans").checked);});
-// 埋めこみ表示（iframe）では印刷できないので、ボタンは単独で開いたときだけ出す
+function updateTotal(){var s=0;TYPES.forEach(function(t){s+=tCounts[t.id]||0;});$("t-total").textContent=s;}
+function setCount(type,v){
+  var max=POOL_BY_TYPE[type].length;
+  v=Math.max(0,Math.min(max,Math.round(+v||0)));
+  tCounts[type]=v;store.set("ionquiz_tcounts",tCounts);
+  var row=$("t-counts").querySelector('[data-type="'+type+'"]');
+  row.querySelector("input").value=v;row.classList.toggle("off",!v);
+  syncSelection(type,false);updateTotal();layoutTest();
+}
+$("t-counts").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-d]");if(!b)return;
+  var type=b.closest(".count-row").dataset.type;setCount(type,(tCounts[type]||0)+(+b.dataset.d));
+});
+$("t-counts").addEventListener("change",function(e){
+  if(e.target.tagName==="INPUT")setCount(e.target.closest(".count-row").dataset.type,e.target.value);
+});
+// 数を変えたときは、すでにえらばれている問題を残したまま足し引きする
+function syncSelection(type,reshuffle){
+  var n=tCounts[type]||0;
+  var cur=reshuffle?[]:(testSel[type]||[]).slice(0,n);
+  if(cur.length<n){
+    var rest=shuffle(POOL_BY_TYPE[type].filter(function(q){return cur.indexOf(q.qid)<0;}));
+    cur=cur.concat(rest.slice(0,n-cur.length).map(function(q){return q.qid;}));
+  }
+  testSel[type]=cur;
+}
+function newTest(){TYPES.forEach(function(t){syncSelection(t.id,true);});layoutTest();}
+
+function measureHost(){
+  var h=$("measure");
+  if(!h){h=document.createElement("div");h.id="measure";h.setAttribute("aria-hidden","true");document.body.appendChild(h);}
+  return h;
+}
+function firstHead(ans){
+  return '<div class="sheet-head"><div><h2>'+TEST_TITLE+(ans?'<span class="ans-badge">解答</span>':"")+'</h2><div class="sub">イオン式・化学式と名前</div></div>'+
+    '<div class="namebox"><span></span>年<span></span>組<span></span>番　名前<span class="w"></span></div></div>';
+}
+function contHead(ans){
+  return '<div class="cont-head"><span>'+TEST_TITLE+(ans?"（解答）":"")+'</span><span class="namebox">名前<span class="w"></span></span></div>';
+}
+function qRowHTML(qs,startNo){
+  return '<div class="qrow">'+qs.map(function(q,i){
+    return '<div class="q"><span class="no">('+(startNo+i)+')</span><span class="p">'+q.prompt+'</span><span class="arrow">→</span><span class="blank">'+q.answer+"</span></div>";
+  }).join("")+"</div>";
+}
+function el(html){var d=document.createElement("div");d.innerHTML=html;return d.firstChild;}
+
+// 1ページに入るだけ入れて、あふれたら次のページへ。見出しだけがページの最後に残らないようにする
+function buildPages(ans){
+  var host=measureHost();
+  var sections=TYPES.filter(function(t){return (testSel[t.id]||[]).length;}).map(function(t){
+    return {type:t.id,qs:testSel[t.id].map(function(id){return BANK_BY_ID[id];})};
+  });
+  var pages=[],page,body;
+  function newPage(){
+    page=document.createElement("div");page.className="page"+(ans?" answers":"");
+    page.innerHTML=(pages.length?contHead(ans):firstHead(ans))+'<div class="pg-body"></div><div class="pg-foot">問題　0 / 0</div>';
+    host.appendChild(page);body=page.querySelector(".pg-body");pages.push(page);
+  }
+  function fits(){return body.scrollHeight<=body.clientHeight+1;}
+  newPage();
+  if(!sections.length)body.innerHTML='<p class="note" style="padding-top:16px">問題数がすべて0です。上で問題数を決めてください。</p>';
+  var no=1;
+  sections.forEach(function(sec,si){
+    var headHTML=function(cont){return '<h3 class="sec-h"><span>'+ROMAN[si]+"　"+SECTION_TITLE[sec.type]+(cont?" <small>（つづき）</small>":"")+"</span></h3>";};
+    for(var i=0;i<sec.qs.length;i+=2){
+      var row=el(qRowHTML(sec.qs.slice(i,i+2),no));no+=Math.min(2,sec.qs.length-i);
+      if(i===0){
+        var h=el(headHTML(false));body.appendChild(h);body.appendChild(row);
+        if(!fits()&&body.childElementCount>2){body.removeChild(h);body.removeChild(row);newPage();body.appendChild(h);body.appendChild(row);}
+      }else{
+        body.appendChild(row);
+        if(!fits()){body.removeChild(row);newPage();body.appendChild(el(headHTML(true)));body.appendChild(row);}
+      }
+    }
+  });
+  pages.forEach(function(p,i){p.querySelector(".pg-foot").textContent=(ans?"解答":"問題")+"　"+(i+1)+" / "+pages.length;});
+  return pages;
+}
+var PAGE_W=210*96/25.4,PAGE_H=297*96/25.4;
+function layoutTest(){
+  var mode=radio("tout");var out=[];
+  if(mode!=="a")out=out.concat(buildPages(false));
+  if(mode!=="q")out=out.concat(buildPages(true));
+  var box=$("pages");box.innerHTML="";
+  out.forEach(function(p){var s=document.createElement("div");s.className="page-slot";s.appendChild(p);box.appendChild(s);});
+  measureHost().innerHTML="";
+  fitPages();
+}
+function fitPages(){
+  var w=$("pages").clientWidth;if(!w)return;
+  var s=Math.min(1,w/PAGE_W);
+  $("pages").querySelectorAll(".page-slot").forEach(function(slot){
+    slot.style.width=(PAGE_W*s)+"px";slot.style.height=(PAGE_H*s)+"px";
+    slot.firstChild.style.transform=s<1?"scale("+s+")":"";
+  });
+}
+window.addEventListener("resize",fitPages);
+$("make-test").addEventListener("click",newTest);
+document.querySelectorAll('input[name="tout"]').forEach(function(r){r.addEventListener("change",layoutTest);});
+
+/* ---------- 印刷・PDF ---------- */
+// 埋めこみ表示（iframe）では印刷できないので、印刷ボタンは単独で開いたときだけ出す
 var topLevel=false;try{topLevel=window.self===window.top;}catch(e){}
 $("print-test").hidden=!topLevel;
 $("print-test").addEventListener("click",function(){window.print();});
 
+function setStatus(html,err){var s=$("t-status");s.innerHTML=html;s.classList.toggle("err",!!err);}
+// claude.ai 上ではファイル保存の機能を使う（ないときは null）
+var dlPromise=(function(){
+  try{if(window.claude&&typeof window.claude.use==="function")return window.claude.use("downloads").catch(function(){return null;});}catch(e){}
+  return Promise.resolve(null);
+})();
+if(!topLevel){$("pdf-test").hidden=true;dlPromise.then(function(dl){$("pdf-test").hidden=!dl;});}
+
+var libsPromise=null;
+function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=function(){rej(new Error("load "+src));};document.head.appendChild(s);});}
+function loadLibs(){
+  if(!libsPromise){
+    libsPromise=Promise.all([
+      loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
+      loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")
+    ]).catch(function(e){libsPromise=null;throw e;});
+  }
+  return libsPromise;
+}
+async function makePdf(){
+  await loadLibs();
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
+  var pages=$("pages").querySelectorAll(".page");var host=measureHost();
+  try{
+    for(var i=0;i<pages.length;i++){
+      setStatus("PDFを作成中… "+(i+1)+" / "+pages.length+" ページ");
+      var clone=pages[i].cloneNode(true);clone.style.transform="";
+      host.innerHTML="";host.appendChild(clone);
+      var canvas=await window.html2canvas(clone,{scale:2,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0});
+      if(i>0)pdf.addPage();
+      pdf.addImage(canvas.toDataURL("image/jpeg",0.9),"JPEG",0,0,210,297);
+    }
+  }finally{host.innerHTML="";}
+  return pdf.output("blob");
+}
+function pdfName(){
+  var d=new Date();var ymd=d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);
+  var mode=radio("tout");
+  return "イオン確認テスト_"+ymd+(mode==="a"?"_解答":mode==="q"?"_問題":"")+".pdf";
+}
+var lastUrl=null;
+$("pdf-test").addEventListener("click",async function(){
+  var btn=this;btn.disabled=true;
+  try{
+    var blob=await makePdf();var name=pdfName();
+    var dl=await dlPromise;
+    if(dl){
+      try{await dl.save({filename:name,data:blob});setStatus("PDFを保存しました（"+esc(name)+"）");}
+      catch(e){
+        if(e&&e.code==="declined")setStatus("保存を取りやめました。");
+        else if(e&&e.code==="rate_limited")setStatus("保存画面がすでに開いています。そちらを閉じてから、もう一度押してください。",true);
+        else setStatus("このページではPDFを保存できませんでした。",true);
+      }
+    }else{
+      if(lastUrl)URL.revokeObjectURL(lastUrl);
+      lastUrl=URL.createObjectURL(blob);
+      var a=document.createElement("a");a.href=lastUrl;a.download=name;document.body.appendChild(a);a.click();a.remove();
+      setStatus('PDFを作成しました。保存画面が出ないときは <a href="'+lastUrl+'" download="'+esc(name)+'" target="_blank" rel="noopener">ここをタップ</a> してください。');
+    }
+  }catch(e){
+    setStatus("PDFを作れませんでした。インターネットにつながっているか確かめて、もう一度押してください。",true);
+  }finally{btn.disabled=false;}
+});
 /* ---------- 起動 ---------- */
-refreshSetup();renderGrid();makeTest();
+renderCounts();refreshSetup();renderGrid();newTest();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layoutTest);
 var lastTab=store.get("ionquiz_tab","quiz");
 var hash=(location.hash||"").slice(1);
 showView(["quiz","table","test"].indexOf(hash)>=0?hash:(["quiz","table","test"].indexOf(lastTab)>=0?lastTab:"quiz"));
