@@ -1,7 +1,7 @@
 # TURNING POINT
 
 - 登録区分: 優先参照チャンネル（[CHANNELS.md](../CHANNELS.md)）
-- URL: https://www.youtube.com/@turningpoint—（登録時に指定されたハンドル。末尾の「—」を含む正確なハンドルは未確認。CHANNELS.md 参照）
+- URL: https://www.youtube.com/channel/UCbPkt2mLv4PzRiJVGQ7LWAA（チャンネルIDのURL。登録時のハンドル `@turningpoint—` の代わりに使う。CHANNELS.md 参照）
 - 状態: 登録のみ（動画ノート未作成）
 
 ## このチャンネルの動画ノート

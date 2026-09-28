@@ -8,7 +8,7 @@
 | # | チャンネル名 | フォルダ | URL | 備考 |
 |---|---|---|---|---|
 | 1 | MAC’S TRAINER ROOM | [macs-trainer-room/](macs-trainer-room/) | https://www.youtube.com/@macstrainerroom | |
-| 2 | TURNING POINT | [turning-point/](turning-point/) | https://www.youtube.com/@turningpoint— | ⚠ 登録時のハンドルは末尾に「—」（全角ダッシュ）が付いていた。正確なハンドルは未確認なので、初めてアクセスするときに確かめてこの欄を直す |
+| 2 | TURNING POINT | [turning-point/](turning-point/) | https://www.youtube.com/channel/UCbPkt2mLv4PzRiJVGQ7LWAA | チャンネル正式名「TURNING POINT ～未来を変える「キッカケ」がここにある～」。登録時のハンドル `@turningpoint—` は末尾に全角ダッシュが入っていて使えないため、Web検索で確認したチャンネルIDのURLを使う（YouTubeのページ自体は未確認）。少年野球・中学野球向けの育成動画が中心なので、高校野球に当てはまるかは個別に確かめる |
 | 3 | Driveline Baseball Japan | [driveline-baseball-japan/](driveline-baseball-japan/) | https://www.youtube.com/@drivelinebaseball_japan | |
 | 4 | こんちゃんベースボール | [konchan-baseball/](konchan-baseball/) | https://www.youtube.com/@konchanbase | |
 | 5 | 日刊スポーツ野球チャンネル | [nikkansports-baseball/](nikkansports-baseball/) | https://www.youtube.com/@nikkansportsbaseball | 報道機関のチャンネル。練習法の解説よりも、選手・指導者のコメントや試合の話題が中心になる可能性がある |
