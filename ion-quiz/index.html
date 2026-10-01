@@ -94,7 +94,16 @@ section.view{padding-top:24px}
 .ion.a{background:var(--ani-soft);color:var(--ani)}
 .plus{color:var(--muted);font-size:.7em}
 .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-@media (max-width:520px){.choices{grid-template-columns:1fr}}
+@media (max-width:520px){
+  .choices{grid-template-columns:1fr;gap:8px;margin-top:12px}
+  .choice{min-height:50px;padding:10px 12px;font-size:18px}
+  .qcard{padding:18px 14px;margin-top:10px}
+  .qprompt{margin:6px 0 2px}
+  .top .wrap{gap:8px;padding-block:8px}
+  .logo h1{font-size:17px}
+  .tab{padding:5px 12px;font-size:13px}
+  section.view{padding-top:14px}
+}
 .choice{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:14px 12px;font-size:19px;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;min-height:58px}
 .choice .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--sunk);font:700 12px/24px var(--f-chem);text-align:center;color:var(--muted)}
 .choice .t{flex:1}
@@ -535,6 +544,13 @@ $("start").addEventListener("click",function(){
 $("quit").addEventListener("click",backToSetup);
 function backToSetup(){run=null;$("quiz-play").hidden=true;$("quiz-result").hidden=true;$("quiz-setup").hidden=false;refreshSetup();}
 
+// 正解を必ず1つ入れ、重複のない4択にする（足りなければ同じ種類の問題の答えで補う）
+function buildChoices(q){
+  var opts=[{key:q.answerKey,html:q.answer}],seen={};seen[q.answerKey]=1;
+  q.distract().concat(shuffle(BANK.filter(function(x){return x.type===q.type;}).map(function(x){return {key:x.answerKey,html:x.answer};})))
+    .forEach(function(o){if(opts.length<4&&!seen[o.key]){seen[o.key]=1;opts.push(o);}});
+  return shuffle(opts);
+}
 function renderQ(){
   var q=run.qs[run.i];var t=TYPE_BY_ID[q.type];
   $("q-count").textContent=(run.i+1)+" / "+run.qs.length;
@@ -544,14 +560,20 @@ function renderQ(){
   $("q-prompt").className="qprompt"+(q.promptJP?" jp":"");
   $("q-ask").textContent=t.ask;
   $("q-feedback").innerHTML="";
+  try{window.scrollTo(0,0);}catch(e){}
   var ch=$("q-choices"),rv=$("q-reveal");
   if(run.mode==="choice"){
     rv.hidden=true;ch.hidden=false;
-    var opts=shuffle([{key:q.answerKey,html:q.answer}].concat(q.distract()));
+    var opts=buildChoices(q);
     ch.innerHTML=opts.map(function(o,i){
       return '<button class="choice" data-key="'+esc(o.key)+'"><span class="n">'+(i+1)+'</span><span class="t">'+o.html+"</span></button>";
     }).join("");
-    ch.querySelectorAll(".choice").forEach(function(b){b.addEventListener("click",function(){answerChoice(b);});});
+    run.shownAt=Date.now();
+    ch.querySelectorAll(".choice").forEach(function(b){b.addEventListener("click",function(){
+      // 「次へ」の連続タップが、次の問題の選択肢に当たってしまうのを防ぐ
+      if(Date.now()-run.shownAt<500)return;
+      answerChoice(b);
+    });});
   }else{
     ch.hidden=true;rv.hidden=false;
     rv.innerHTML='<p class="note">ノートに答えを書いてから押してね</p><button class="btn" id="show-answer">答えを見る</button>';
@@ -582,7 +604,8 @@ function answerChoice(btn){
   $("q-feedback").innerHTML='<div class="feedback '+(ok?"ok":"ng")+'"><div><b>'+(ok?"○ 正解！":"× ざんねん")+"</b>"+
     (ok?(q.note?' <span class="ans">'+q.note+"</span>":""):' <span class="ans">答え：'+q.answer+(q.note?"（"+q.note+"）":"")+"</span>")+
     '</div><button class="btn small" id="next">'+(last?"結果を見る":"次へ")+"</button></div>";
-  $("next").addEventListener("click",next);$("next").focus();
+  $("next").addEventListener("click",next);$("next").focus({preventScroll:true});
+  var fb=$("q-feedback");if(fb.getBoundingClientRect().bottom>window.innerHeight)fb.scrollIntoView({block:"end",behavior:"smooth"});
 }
 function next(){
   run.i++;
