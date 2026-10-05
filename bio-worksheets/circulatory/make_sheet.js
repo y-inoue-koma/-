@@ -4,7 +4,7 @@
 const fs = require('fs');
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType,
-  BorderStyle, AlignmentType, VerticalAlign, PageOrientation, HeightRule, ShadingType,
+  BorderStyle, AlignmentType, VerticalAlign, PageOrientation, HeightRule, ShadingType, ImageRun, LineRuleType,
 } = require('docx');
 
 const ANSWER = process.argv[2] === 'answer';
@@ -18,7 +18,7 @@ const mm = (v) => Math.round(v * 56.693);
 const t = (text, o = {}) => new TextRun({ text, font: FONT, size: o.size || SZ, bold: o.bold, color: o.color, underline: o.underline });
 const p = (runs, o = {}) => new Paragraph({
   children: Array.isArray(runs) ? runs : [typeof runs === 'string' ? t(runs) : runs],
-  spacing: { before: o.before || 0, after: o.after || 0, line: o.line || 260 },
+  spacing: { before: o.before || 0, after: o.after || 0, line: o.line || 260, lineRule: o.lineRule || LineRuleType.AT_LEAST },
   alignment: o.align, indent: o.indent, border: o.border, shading: o.shading,
 });
 // 穴埋め：生徒用は空欄、解答は赤字
@@ -157,13 +157,13 @@ right.push(table([HP, HC], [row([
     check('大静脈・肺静脈'), check('弁'), check('心室の壁の厚さ'), p([t('　（左右で比べる）', { size: 14 })]),
     check('冠動脈（心臓の'), p([t('　表面の血管）', { size: 14 })]),
   ], HC, { borders: boxBorders('777777'), fill: 'F2F6FA', margins: { top: 60, bottom: 40, left: 100, right: 60 } }),
-], mm(88))]));
+], mm(64))]));
 right.push(p([t('気づいたこと：', { bold: true, size: 16 }), ...(ANSWER ? [t('左心室の壁は右心室より厚い。動脈は壁が厚く弾力があり、静脈は壁が薄い。', { color: RED, size: 16 })] : [])], { before: 50, line: 360, border: { bottom: line('AAAAAA', BorderStyle.DOTTED, 4) } }));
 if (!ANSWER) right.push(...writeLines(1));
 
 // まとめ
-right.push(heading('まとめ　実験から生物基礎の知識へ', 120));
-right.push(subhead('1. 血液の成分　〔Ⅰとつなげる〕'));
+right.push(heading('まとめ', 120));
+right.push(subhead('1. 血液の成分　＜実験Ⅰ＞'));
 right.push(p([t('液体成分＝'), ...blank('血しょう', 5), t('が約55％、有形成分＝'), ...blank('血球', 4), t('が約45％。血球は'), ...blank('骨髄', 3), t('でつくられる。')]));
 const TW = [mm(20), mm(12), mm(26), IN - mm(58)];
 const th = (s, w) => cell([p([t(s, { bold: true, size: 16 })], { align: AlignmentType.CENTER })], w, { borders: boxBorders('777777', BorderStyle.SINGLE, 4), fill: 'DCE6F0', margins: { top: 10, bottom: 10, left: 40, right: 40 } });
@@ -176,22 +176,41 @@ right.push(table(TW, [
   row([td([t('血しょう')], TW[0], 1), td([t('－')], TW[1], 1), td([t('－')], TW[2], 1), td([t('栄養分・老廃物の運搬、血液凝固、免疫', { size: 16 })], TW[3])], mm(5.5)),
 ]));
 
-right.push(subhead('2. ヘモグロビンと血液の色　〔Ⅱとつなげる〕'));
+right.push(subhead('2. ヘモグロビンと血液の色　＜実験Ⅱ＞'));
 right.push(p([t('◇ 赤血球に含まれるタンパク質'), ...blank('ヘモグロビン', 6), t('は、')]));
 right.push(p([t('　酸素濃度が高いところでは酸素と'), ...choice(['結合', '解離'], '結合'), t('し、'), ...blank('酸素ヘモグロビン', 7), t('になる。')]));
 right.push(p([t('　酸素濃度が低いところでは酸素と'), ...choice(['結合', '解離'], '解離'), t('する。')]));
 right.push(p([t('◇ 酸素が多い'), ...blank('動脈血', 4), t('は'), ...blank('鮮紅', 3), t('色、酸素が少ない'), ...blank('静脈血', 4), t('は'), ...blank('暗赤', 3), t('色。')]));
 right.push(p([t('◇ 二酸化炭素は'), ...blank('炭酸水素イオン', 7), t('となり、'), ...blank('血しょう', 4), t('に溶けて運ばれる。')]));
 
-right.push(subhead('3. 心臓・血管のつくり　〔Ⅲとつなげる〕'));
-right.push(p([t('◇'), ...blank('心房', 3), t('：肺や全身から戻ってきた血液を心室に送り出す。'), ...blank('心室', 3), t('：肺や全身に血液を送り出す。')]));
-right.push(p([t('◇'), ...blank('洞房結節', 6), t('（ペースメーカー）：規則的な電気信号を発生し、収縮のリズムをつくる。')]));
-right.push(p([t('◇ 動脈は高い血圧に耐えるため壁が'), ...blank('厚い', 2), t('。静脈には逆流を防ぐ'), ...blank('弁', 2), t('がある。')]));
-right.push(p([t('◇ 血液の流れ　肺循環：右心室→'), ...blank('肺動脈', 4), t('→肺→'), ...blank('肺静脈', 4), t('→左心房')]));
-right.push(p([t('　　　　　　　 体循環：左心室→'), ...blank('大動脈', 4), t('→全身→'), ...blank('大静脈', 4), t('→右心房')]));
-right.push(p([t('考えよう', { bold: true, color: ACCENT }), t('　左心室の壁が右心室より厚いのはなぜか。', { size: 16 })], { before: 40 }));
-if (ANSWER) right.push(p([t('左心室は全身へ血液を送り出すため、肺へ送る右心室より強い力（高い圧力）が必要だから。', { color: RED, size: 16 })], { line: 300 }));
-else right.push(...writeLines(1));
+right.push(subhead('3. 心臓・血管のつくり　＜実験Ⅲ＞'));
+// 左：穴埋め　右：ヒトの循環系の図（テキストより）
+const FIG_W = mm(40), FIG_H = Math.round(FIG_W * 1323 / 965);
+const S3R = FIG_W + 120, S3L = IN - S3R;
+const s3 = [
+  p([t('◇'), ...blank('心房', 3), t('：肺や全身から戻ってきた血液を心室に送り出す。')]),
+  p([t('◇'), ...blank('心室', 3), t('：肺や全身に血液を送り出す。')]),
+  p([t('◇'), ...blank('洞房結節', 6), t('（ペースメーカー）：規則的な電気信号を')]),
+  p([t('　発生し、収縮のリズムをつくる。')]),
+  p([t('◇ 動脈は高い血圧に耐えるため壁が'), ...blank('厚い', 2), t('。')]),
+  p([t('◇ 静脈には逆流を防ぐ'), ...blank('弁', 2), t('がある。')]),
+  p([t('◇ 血液の流れ（右の図で確かめよう）')], { before: 20 }),
+  p([t('　肺循環：右心室→'), ...blank('肺動脈', 4), t('→肺→'), ...blank('肺静脈', 4), t('→左心房')]),
+  p([t('　体循環：左心室→'), ...blank('大動脈', 4), t('→全身→'), ...blank('大静脈', 4), t('→右心房')]),
+  p([t('考えよう', { bold: true, color: ACCENT }), t('　左心室の壁が右心室より厚いのはなぜか。', { size: 16 })], { before: 60 }),
+  ...(ANSWER
+    ? [p([t('左心室は全身へ血液を送り出すため、肺へ送る右心室より', { color: RED, size: 16 })], { line: 300 }),
+       p([t('強い力（高い圧力）が必要だから。', { color: RED, size: 16 })], { line: 300 })]
+    : writeLines(1, S3L - 80)),
+];
+right.push(table([S3L, S3R], [row([
+  cell(s3, S3L, { margins: { top: 0, bottom: 0, left: 0, right: 80 } }),
+  cell([
+    p([new ImageRun({ type: 'jpg', data: fs.readFileSync(__dirname + '/circulation_figure.jpg'),
+      transformation: { width: Math.round(FIG_W / 15), height: Math.round(FIG_H / 15) } })], { align: AlignmentType.CENTER, line: 240, lineRule: LineRuleType.AUTO }),
+    p([t('図　ヒトの循環系', { size: 14 })], { align: AlignmentType.CENTER }),
+  ], S3R, { margins: { top: 0, bottom: 0, left: 60, right: 60 } }),
+])]));
 
 // ========== 組み立て ==========
 const outer = new Table({
